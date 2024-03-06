@@ -140,6 +140,12 @@ export default [
         redirect: '/list/table-list',
       },
       {
+        name: 'video-collection',
+        icon: 'smile',
+        path: '/list/video-collection',
+        component: './list/video-collection',
+      },
+      {
         name: 'table-list',
         icon: 'smile',
         path: '/list/table-list',
