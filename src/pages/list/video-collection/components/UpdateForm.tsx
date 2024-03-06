@@ -1,4 +1,3 @@
-import { updateRule } from '@/services/ant-design-pro/api';
 import {
   ProFormDateTimePicker,
   ProFormRadio,
@@ -11,6 +10,7 @@ import { FormattedMessage, useIntl, useRequest } from '@umijs/max';
 import { message, Modal } from 'antd';
 import React, { cloneElement, useCallback, useState } from 'react';
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
+import { updateVideoCollection } from "@/pages/list/video-collection/api";
 
 export type FormValueType = {
   target?: string;
@@ -35,7 +35,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run } = useRequest(updateRule, {
+  const { run } = useRequest(updateVideoCollection, {
     manual: true,
     onSuccess: () => {
       messageApi.success('Configuration is successful');

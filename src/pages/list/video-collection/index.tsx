@@ -12,13 +12,7 @@ import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 import { VideoCollectionItem, VideoCollectionPagination } from "@/pages/list/video-collection/data";
 import { listVideoCollection, removeVideoCollection } from "@/pages/list/video-collection/api";
-import { BorderHorizontalOutlined, BorderVerticleOutlined, FileTextOutlined } from "@ant-design/icons";
-
-const ContentIcon: Map<number, React.ReactNode> = new Map([
-  [0, (<div key={0}><FileTextOutlined /> 图文</div>)],
-  [1, (<div key={1}><BorderHorizontalOutlined /> 横版短视频</div>)],
-  [2, (<div key={2}><BorderVerticleOutlined/> 竖版短视频</div>)],
-]);
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -48,6 +42,29 @@ const TableList: React.FC = () => {
     },
   });
 
+  /**
+   *  Delete node
+   * @zh-CN 删除节点
+   *
+   * @param selectedRows
+   */
+  const handleRemove = useCallback(
+    async (selectedRows: VideoCollectionItem[]) => {
+      if (!selectedRows?.length) {
+        messageApi.warning('请选择删除项');
+        return;
+      }
+      if (selectedRows?.length > 1) {
+        messageApi.warning('目前只支持删除单条记录');
+        return;
+      }
+      await delRun({
+        id: selectedRows[0].id,
+      });
+    },
+    [delRun],
+  );
+
   const columns: ProColumns<VideoCollectionItem>[] = [
     {
       title: '集合编号',
@@ -74,47 +91,16 @@ const TableList: React.FC = () => {
       title: '内容体裁',
       dataIndex: 'contentType',
       hideInForm: true,
-      valueEnum: ContentIcon,
+      valueEnum: contentTypeMap,
       valueType: 'select',
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
-      render: (dom, entity) => ContentIcon.get(entity.contentType),
+      render: (dom, entity) => contentTypeMap.get(entity.contentType),
     },
     {
       title: '筛选方式',
       dataIndex: 'filterType',
       hideInForm: true,
-      valueEnum: {
-        0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
-          status: 'Default',
-        },
-        1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
-          status: 'Processing',
-        },
-        2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
-          status: 'Success',
-        },
-        3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
-          status: 'Error',
-        },
-      },
+      valueEnum: filterTypeMap,
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
       valueType: 'select'
     },
@@ -135,23 +121,7 @@ const TableList: React.FC = () => {
       hideInForm: true,
       valueType: 'select',
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
-      valueEnum: {
-        false: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="未上线"
-            />
-          ),
-          status: 'Default',
-        },
-        true: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
-          status: 'Processing',
-        },
-      },
+      valueEnum: isOnlineMap,
     },
     {
       title: '创建时间',
@@ -167,9 +137,7 @@ const TableList: React.FC = () => {
       sorter: true,
       dataIndex: 'updatedAt',
       valueType: 'dateTime',
-      renderFormItem: () => {
-          return false;
-      },
+      hideInSearch: true,
     },
     {
       title: '操作',
@@ -178,46 +146,16 @@ const TableList: React.FC = () => {
       render: (_, record) => [
         <UpdateForm
           trigger={
-            <a>
-              <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-            </a>
+            <a>修改</a>
           }
           key="config"
-          onOk={actionRef.current?.reload}
-          values={record}
+          onOk={ actionRef.current?.reload }
+          values={ record }
         />,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
-        </a>,
+        <a key='delete' onClick={ () => delRun({id: record.id}) }> 删除 </a>,
       ],
     },
   ];
-
-  /**
-   *  Delete node
-   * @zh-CN 删除节点
-   *
-   * @param selectedRows
-   */
-  const handleRemove = useCallback(
-    async (selectedRows: VideoCollectionItem[]) => {
-      if (!selectedRows?.length) {
-        messageApi.warning('请选择删除项');
-        return;
-      }
-      if (selectedRows?.length > 1) {
-        messageApi.warning('目前只支持删除单条记录');
-        return;
-      }
-      await delRun({
-        id: selectedRows[0].id,
-      });
-    },
-    [delRun],
-  );
 
   return (
     <PageContainer>
@@ -236,7 +174,7 @@ const TableList: React.FC = () => {
         request={listVideoCollection}
         columns={columns}
         pagination={{
-          defaultPageSize: 3,
+          defaultPageSize: 2,
         }}
         rowSelection={{
           onChange: (_, selectedRows) => {
