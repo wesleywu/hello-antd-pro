@@ -1,7 +1,7 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from '@umijs/max';
-import { VideoCollectionItem } from './data.d';
+import { PageInfo, VideoCollectionItem } from './data.d';
 import { MultiType, OperatorType, ProtoType, RequestParamConfig, toRequest, WildcardType } from "@/utils/requestParams";
 import type { SortOrder } from "antd/lib/table/interface";
 
@@ -48,8 +48,7 @@ export async function listVideoCollection(
   const resp = await request<{
     items: VideoCollectionItem[];
     /** 列表的内容总数 */
-    total?: number;
-    current?: number;
+    pageInfo: PageInfo;
   }>('/v1/video-collection/list', {
     method: 'POST',
     data: data,
@@ -57,12 +56,12 @@ export async function listVideoCollection(
   });
   return {
     data: resp.items,
-    current: resp.current,
+    current: resp.pageInfo.number,
     // success 请返回 true，
     // 不然 table 会停止解析数据，即使有数据
     success: true,
     // 不传会使用 data 的长度，如果是分页一定要传
-    total: resp.total,
+    total: resp.pageInfo.totalElements,
   };
 }
 

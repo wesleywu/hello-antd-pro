@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone"
 import type { SortOrder } from "antd/lib/table/interface";
+import { PageRequest, Sort } from "@/pages/list/video-collection/data";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -428,26 +429,31 @@ export function toRequest(paramsConfig: RequestParamConfig[], paramObj: object, 
     }
     conditions.push(condition);
   }
-  conditions.push(`"page": ${pageNum}`);
-  conditions.push(`"pageSize": ${pageSize}`)
+  const pageRequest: PageRequest = {
+    number: pageNum,
+    size: pageSize,
+  }
   if (sort) {
-    let sorts: string[] = []
+    let sorts: Sort[] = []
     for (const field in sort) {
       if (!Object.hasOwn(sort, field)) {
         continue
       }
       const order = sort[field];
-      let orderString = 'ASC'
+      let orderDirection = 'Asc'
       if (order === 'descend') {
-        orderString = 'DESC';
+        orderDirection = 'Desc';
       }
-      sorts.push(`${field} ${orderString}`)
-
-      if (sorts.length > 0) {
-        conditions.push(`"orderBy": "${sorts.join(',')}"`);
-      }
+      sorts.push({
+        property: field,
+        direction: orderDirection,
+      })
+    }
+    if (sorts.length > 0) {
+      pageRequest.sorts = sorts
     }
   }
+  conditions.push(`"pageRequest": ${JSON.stringify(pageRequest)}`);
   console.log('toRequest: ' + conditions.join(',\n'));
   return `{
     ${conditions.join(',\n')}

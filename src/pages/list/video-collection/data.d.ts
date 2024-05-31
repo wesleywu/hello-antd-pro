@@ -1,31 +1,45 @@
 export type VideoCollectionItem = {
   id: string;
   name: string;
-  contentType: number;
-  filterType: number;
+  contentType: string;
+  filterType: string;
   count: number;
   isOnline: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
 
-export type VideoCollectionPagination = {
-  total: number;
-  pageSize: number;
-  current: number;
+export type PageRequest = {
+  number: number;
+  size: number;
+  sorts?: Sort[];
+}
+
+export type PageInfo = {
+  number: number;
+  size: number;
+  numberOfElements: number;
+  totalElements: number;
+  first: boolean;
+  last: boolean;
+  sorts: Sort[]
 };
+
+export type Sort = {
+  property: string,
+  direction: string,
+}
 
 export type VideoCollectionData = {
   items: VideoCollectionItem[];
-  current: number;
-  total: number;
+  pageInfo: PageInfo;
 };
 
 export type VideoCollectionParams = {
   id: string;
   name: string;
-  contentType: number;
-  filterType: number;
+  contentType: string;
+  filterType: string;
   count: number;
   isOnline: boolean;
   createdAt: Date;

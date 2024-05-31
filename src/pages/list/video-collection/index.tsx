@@ -10,7 +10,7 @@ import { Button, DatePicker, Drawer, message } from 'antd';
 import React, { useCallback, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
-import { VideoCollectionItem, VideoCollectionPagination } from "@/pages/list/video-collection/data";
+import { VideoCollectionItem } from "@/pages/list/video-collection/data";
 import { listVideoCollection, removeVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 
@@ -160,7 +160,7 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<VideoCollectionItem, VideoCollectionPagination>
+      <ProTable<VideoCollectionItem>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
