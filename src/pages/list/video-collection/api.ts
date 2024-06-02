@@ -5,33 +5,18 @@ import { PageInfo, VideoCollectionItem } from './data.d';
 import { MultiType, OperatorType, ProtoType, RequestParamConfig, toRequest, WildcardType } from "@/utils/requestParams";
 import type { SortOrder } from "antd/lib/table/interface";
 
-export const ContentType: Map<number, string> = new Map([
-  [0, '图文'],
-  [1, '横版短视频'],
-  [2, '竖版短视频'],
-]);
-export const FilterType: Map<number, string> = new Map([
-  [0, '规则筛选'],
-  [1, '人工'],
-]);
-export const Status: Map<boolean, string> = new Map([
-  [false, '未上线'],
-  [true, '已上线'],
-]);
-
 export const ColumnConfigs: RequestParamConfig[] = [
-  new RequestParamConfig('id', ProtoType.StringValue, OperatorType.EQ, MultiType.NoMulti),
+  new RequestParamConfig('id', ProtoType.ObjectID, OperatorType.EQ, MultiType.NoMulti),
   new RequestParamConfig('name', ProtoType.StringValue, OperatorType.Like, MultiType.NoMulti, WildcardType.Contains),
-  new RequestParamConfig('contentType', ProtoType.Int32Slice, OperatorType.EQ, MultiType.In),
-  new RequestParamConfig('filterType', ProtoType.Int32Slice, OperatorType.EQ, MultiType.In),
+  new RequestParamConfig('contentType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
+  new RequestParamConfig('filterType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
   new RequestParamConfig('count', ProtoType.UInt32Slice, OperatorType.EQ, MultiType.Between),
   new RequestParamConfig('isOnline', ProtoType.BoolSlice, OperatorType.EQ, MultiType.In),
   new RequestParamConfig('createdAt', ProtoType.DateBetween, OperatorType.EQ, MultiType.Between),
   new RequestParamConfig('updatedAt', ProtoType.DateTimeBetween, OperatorType.EQ, MultiType.Between),
 ]
 
-
-/** 获取规则列表 GET /api/rule */
+/** 获取视频集列表 GET /v1/video-collection/list */
 export async function listVideoCollection(
   params: {
     // query
@@ -65,7 +50,7 @@ export async function listVideoCollection(
   };
 }
 
-/** 新建规则 PUT /api/rule */
+/** 新建视频集 PUT /api/rule */
 export async function updateVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
   return request<VideoCollectionItem>('/v1/video-collection', {
     data,
@@ -74,7 +59,7 @@ export async function updateVideoCollection(data: { [key: string]: any }, option
   });
 }
 
-/** 新建规则 POST /api/rule */
+/** 新建视频集 POST /v1/video-collection */
 export async function addVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
   console.log(data);
   return request<VideoCollectionItem>('/v1/video-collection', {
@@ -84,7 +69,7 @@ export async function addVideoCollection(data: { [key: string]: any }, options?:
   });
 }
 
-/** 删除规则 DELETE /api/rule */
+/** 删除视频集 DELETE /v1/video-collection */
 export async function removeVideoCollection(data: { id: string }, options?: { [key: string]: any }) {
   console.log('delete id: ' + data.id);
   return request<Record<string, any>>('/v1/video-collection/' + data.id, {

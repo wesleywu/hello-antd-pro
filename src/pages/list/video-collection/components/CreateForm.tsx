@@ -56,17 +56,6 @@ const CreateForm: FC<CreateFormProps> = (props) => {
         }}
       >
         <ProFormText
-          label='集合编号'
-          rules={[
-            {
-              required: true,
-              message: ('集合编号必须输入'),
-            },
-          ]}
-          width="lg"
-          name="id"
-        />
-        <ProFormText
           label='集合名称'
           rules={[
             {

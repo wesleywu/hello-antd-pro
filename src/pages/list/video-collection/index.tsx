@@ -6,13 +6,15 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl, useRequest } from '@umijs/max';
-import { Button, DatePicker, Drawer, message } from 'antd';
+import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
 import React, { useCallback, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
 import { listVideoCollection, removeVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import FormDigitRange from "@/components/DigitRange";
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
@@ -91,8 +93,8 @@ const TableList: React.FC = () => {
       title: '内容体裁',
       dataIndex: 'contentType',
       hideInForm: true,
-      valueEnum: contentTypeMap,
       valueType: 'select',
+      valueEnum: contentTypeMap,
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
       render: (dom, entity) => contentTypeMap.get(entity.contentType),
     },
@@ -100,9 +102,9 @@ const TableList: React.FC = () => {
       title: '筛选方式',
       dataIndex: 'filterType',
       hideInForm: true,
+      valueType: 'select',
       valueEnum: filterTypeMap,
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
-      valueType: 'select'
     },
     {
       title: '内容量',
@@ -114,14 +116,18 @@ const TableList: React.FC = () => {
           id: 'pages.searchTable.tenThousand',
           defaultMessage: ' 万 ',
         })}`,
+      hideInSearch: true,
+      // renderFormItem: () => {
+      //   return <FormDigitRange suffix="万" placeholder={['内容量最小值', '内容量最大值']} min={0} max={999999}></FormDigitRange>;
+      // },
     },
     {
       title: '是否上线',
       dataIndex: 'isOnline',
       hideInForm: true,
       valueType: 'select',
-      fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
       valueEnum: isOnlineMap,
+      fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
     },
     {
       title: '创建时间',
@@ -152,7 +158,15 @@ const TableList: React.FC = () => {
           onOk={ actionRef.current?.reload }
           values={ record }
         />,
-        <a key='delete' onClick={ () => delRun({id: record.id}) }> 删除 </a>,
+        <Popconfirm
+          key='delete-confirm'
+          title="删除记录"
+          description="确定要删除这条记录吗？"
+          icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          onConfirm={() => delRun({id: record.id})}
+        >
+          <a key='delete'> 删除 </a>
+        </Popconfirm>
       ],
     },
   ];
@@ -201,17 +215,23 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            loading={loading}
-            onClick={() => {
+          <Popconfirm
+            title="删除记录"
+            description="确定要删除选中的记录吗？"
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+            onConfirm={() => {
               handleRemove(selectedRowsState);
             }}
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
+            <Button
+              loading={loading}
+            >
+              <FormattedMessage
+                id="pages.searchTable.batchDeletion"
+                defaultMessage="Batch deletion"
+              />
+            </Button>
+          </Popconfirm>
           <Button type="primary">
             <FormattedMessage
               id="pages.searchTable.batchApproval"

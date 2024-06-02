@@ -26,6 +26,8 @@ export enum ProtoType {
   StringSlice,
   DateBetween,
   DateTimeBetween,
+  ObjectID,
+  ObjectIDSlice,
 }
 
 const protoTypeNameMap = new Map<ProtoType, string>([
@@ -47,6 +49,8 @@ const protoTypeNameMap = new Map<ProtoType, string>([
   [ProtoType.StringSlice, 'goguru.types.StringSlice'],
   [ProtoType.DateBetween, 'goguru.types.TimestampSlice'],
   [ProtoType.DateTimeBetween, 'goguru.types.TimestampSlice'],
+  [ProtoType.ObjectID, 'goguru.types.ObjectID'],
+  [ProtoType.ObjectIDSlice, 'goguru.types.ObjectIDSlice'],
 ]);
 
 export enum OperatorType {
@@ -123,8 +127,8 @@ export class RequestParamConfig {
       return '';
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
-      "operator": "${this.operatorType}", 
+      "@type":"goguru.query.Condition",
+      "operator": "${this.operatorType}",
       "value":{
         "@type":"${protoTypeNameMap.get(protoType)}",
         "value":${paramValue}
@@ -142,8 +146,8 @@ export class RequestParamConfig {
       return '';
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
-      "operator": "${this.operatorType}", 
+      "@type":"goguru.query.Condition",
+      "operator": "${this.operatorType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.BoolValue)}",
         "value":${paramValue}
@@ -164,8 +168,8 @@ export class RequestParamConfig {
       return '';
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
-      "operator": "${this.operatorType}", 
+      "@type":"goguru.query.Condition",
+      "operator": "${this.operatorType}",
       "wildcard": "${this.wildcardType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.StringValue)}",
@@ -193,7 +197,7 @@ export class RequestParamConfig {
     const paramValueArray: Array<number> = paramValue as Array<number>;
     if (this.multiType === MultiType.In || this.multiType === MultiType.NotIn) {
       return `"${this.name}": {
-        "@type":"goguru.types.Condition",
+        "@type":"goguru.query.Condition",
         "multi": "${this.multiType}",
         "value":{
           "@type":"${protoTypeNameMap.get(protoType)}",
@@ -211,7 +215,7 @@ export class RequestParamConfig {
     }
     if (paramValueArray[0] === undefined) {
       return `"${this.name}": {
-        "@type":"goguru.types.Condition",
+        "@type":"goguru.query.Condition",
         "operator": "${this.multiType === MultiType.Between ? OperatorType.LTE : OperatorType.GT}",
         "value":{
           "@type":"${protoTypeNameMap.get(singleValueProtoType)}",
@@ -221,7 +225,7 @@ export class RequestParamConfig {
     }
     if (paramValueArray[1] === undefined) {
       return `"${this.name}": {
-        "@type":"goguru.types.Condition",
+        "@type":"goguru.query.Condition",
         "operator": "${this.multiType === MultiType.Between ? OperatorType.GTE : OperatorType.LT}",
         "value":{
           "@type":"${protoTypeNameMap.get(singleValueProtoType)}",
@@ -230,7 +234,7 @@ export class RequestParamConfig {
       }`;
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
+      "@type":"goguru.query.Condition",
       "multi": "${this.multiType}",
       "value":{
         "@type":"${protoTypeNameMap.get(protoType)}",
@@ -261,7 +265,7 @@ export class RequestParamConfig {
       return '';
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
+      "@type":"goguru.query.Condition",
       "multi": "${this.multiType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.BoolSlice)}",
@@ -299,7 +303,7 @@ export class RequestParamConfig {
       return '';
     }
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
+      "@type":"goguru.query.Condition",
       "multi": "${this.multiType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.StringSlice)}",
@@ -332,10 +336,10 @@ export class RequestParamConfig {
       console.error(`element count of ${this.name} property array should be exactly 2 for MultiType ${this.multiType}`);
       return '';
     }
-    const dateStart = dayjs(paramValueArray[0]).tz('Asia/Shanghai').toISOString();
-    const dateEnd = dayjs(paramValueArray[1]).tz('Asia/Shanghai').add(1, 'day').subtract(1, 'ms').toISOString();
+    const dateStart = dayjs(paramValueArray[0]).set('h', 0).set('m', 0).set('s', 0).set('ms', 0).tz('Asia/Shanghai').toISOString();
+    const dateEnd = dayjs(paramValueArray[1]).set('h', 0).set('m', 0).set('s', 0).set('ms', 0).tz('Asia/Shanghai').add(1, 'day').subtract(1, 'ms').toISOString();
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
+      "@type":"goguru.query.Condition",
       "multi": "${this.multiType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.DateBetween)}",
@@ -371,11 +375,72 @@ export class RequestParamConfig {
     const dateStart = dayjs(paramValueArray[0]).tz('Asia/Shanghai').toISOString();
     const dateEnd = dayjs(paramValueArray[1]).tz('Asia/Shanghai').toISOString();
     return `"${this.name}": {
-      "@type":"goguru.types.Condition",
+      "@type":"goguru.query.Condition",
       "multi": "${this.multiType}",
       "value":{
         "@type":"${protoTypeNameMap.get(ProtoType.DateTimeBetween)}",
         "value":["${dateStart}","${dateEnd}"]
+      }
+    }`;
+  }
+
+  private conditionObjectID(paramsObj: object): string {
+    const paramValue = paramsObj[this.name];
+    if (paramValue === undefined) {
+      return '';
+    }
+    if (typeof paramValue !== 'string' ) {
+      console.error('type of ' + this.name + ' property of params should be String')
+      return '';
+    }
+    if (String(paramValue).trim().length === 0) {
+      return '';
+    }
+    return `"${this.name}": {
+      "@type":"goguru.query.Condition",
+      "operator": "${this.operatorType}",
+      "wildcard": "${this.wildcardType}",
+      "value":{
+        "@type":"${protoTypeNameMap.get(ProtoType.ObjectID)}",
+        "value":"${paramValue}"
+      }
+    }`
+  }
+
+  private conditionObjectIDSlice(paramsObj: object): string {
+    const paramValue = paramsObj[this.name];
+    if (paramValue === undefined) {
+      return '';
+    }
+    if (!Array.isArray(paramValue)) {
+      console.error('type of ' + this.name + ' property of params should be Array');
+      return '';
+    }
+    if (this.multiType === MultiType.NoMulti) {
+      console.error(`type of ${this.name} property of params is Array, but MultiType is ${this.multiType}`);
+      return '';
+    }
+    const paramValueArray: Array<string> = [];
+    (paramValue as Array<never>).forEach(value => {
+      if (typeof value === 'string') {
+        paramValueArray.push('"' + value + '"');
+      } else {
+        console.error('element type of ' + this.name + ' property of params should be String');
+      }
+    })
+    if (paramValueArray.length === 0) {
+      return '';
+    }
+    if ((this.multiType === MultiType.Between || this.multiType === MultiType.NotBetween) && paramValueArray.length !== 2) {
+      console.error(`element count of ${this.name} property array should be exactly 2 for MultiType ${this.multiType}`);
+      return '';
+    }
+    return `"${this.name}": {
+      "@type":"goguru.query.Condition",
+      "multi": "${this.multiType}",
+      "value":{
+        "@type":"${protoTypeNameMap.get(ProtoType.ObjectIDSlice)}",
+        "value":[${(paramValueArray).join(',')}]
       }
     }`;
   }
@@ -413,6 +478,10 @@ export class RequestParamConfig {
         return this.conditionDateBetween(paramsObj);
       case ProtoType.DateTimeBetween:
         return this.conditionDateTimeBetween(paramsObj);
+      case ProtoType.ObjectID:
+        return this.conditionObjectID(paramsObj);
+      case ProtoType.ObjectIDSlice:
+        return this.conditionObjectIDSlice(paramsObj);
       default:
         return '';
     }
