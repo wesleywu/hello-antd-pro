@@ -14,10 +14,10 @@ import { VideoCollectionItem } from "@/pages/list/video-collection/data";
 import { listVideoCollection, removeVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import FormDigitRange from "@/components/DigitRange";
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const [updateFormVisible, handleUpdateFormVisible] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<VideoCollectionItem>();
@@ -150,14 +150,15 @@ const TableList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <UpdateForm
-          trigger={
-            <a>修改</a>
-          }
+        <a
           key="config"
-          onOk={ actionRef.current?.reload }
-          values={ record }
-        />,
+          onClick={() => {
+            handleUpdateFormVisible(true);
+            setCurrentRow(record);
+          }}
+        >
+          修改
+        </a>,
         <Popconfirm
           key='delete-confirm'
           title="删除记录"
@@ -240,7 +241,17 @@ const TableList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
-
+      <UpdateForm
+        key="修改"
+        updateFormVisible={updateFormVisible}
+        onOk={ actionRef.current?.reload }
+        onCancel={() => {
+          handleUpdateFormVisible(false);
+          setCurrentRow(undefined);
+        }}
+        idValue={currentRow?.id || ''}
+        values={currentRow || {}}
+      />,
       <Drawer
         width={600}
         open={showDetail}

@@ -8,8 +8,8 @@ import {
 } from '@ant-design/pro-components';
 import { Button, message } from 'antd';
 import { FC, useRef } from 'react';
-import { addVideoCollection } from "@/pages/list/video-collection/api";
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
+import { addVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 import { useRequest } from "@umijs/max";
 
@@ -30,12 +30,12 @@ const CreateForm: FC<CreateFormProps> = (props) => {
   const { run } = useRequest(addVideoCollection, {
     manual: true,
     onSuccess: () => {
-      messageApi.success('Added successfully');
+      messageApi.success('新增视频集合成功');
       formRef.current?.resetFields();
       reload?.();
     },
     onError: () => {
-      messageApi.error('Adding failed, please try again!');
+      messageApi.error('新增视频集合失败，请重试');
     },
   });
 

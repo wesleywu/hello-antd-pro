@@ -1,246 +1,123 @@
 import {
-  ProFormDateTimePicker,
-  ProFormRadio,
+  DrawerForm,
+  ProFormDigit,
+  ProFormInstance,
   ProFormSelect,
   ProFormText,
-  ProFormTextArea,
-  StepsForm,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl, useRequest } from '@umijs/max';
-import { message, Modal } from 'antd';
-import React, { cloneElement, useCallback, useState } from 'react';
+import { useRequest } from '@umijs/max';
+import { message } from 'antd';
+import { FC, useRef } from 'react';
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
 import { updateVideoCollection } from "@/pages/list/video-collection/api";
-
-export type FormValueType = {
-  target?: string;
-  template?: string;
-  type?: string;
-  time?: string;
-  frequency?: string;
-} & Partial<API.RuleListItem>;
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 
 export type UpdateFormProps = {
-  trigger?: JSX.Element;
   onOk?: () => void;
+  onCancel: () => void;
+  updateFormVisible: boolean;
+  idValue: string;
   values: Partial<VideoCollectionItem>;
 };
 
-const UpdateForm: React.FC<UpdateFormProps> = (props) => {
-  const { onOk, values, trigger } = props;
-
-  const intl = useIntl();
-
-  const [open, setOpen] = useState(false);
-
+const UpdateForm: FC<UpdateFormProps> = (props) => {
+  const { onOk, onCancel } = props;
+  const formRef = useRef<ProFormInstance>();
   const [messageApi, contextHolder] = message.useMessage();
 
   const { run } = useRequest(updateVideoCollection, {
     manual: true,
     onSuccess: () => {
-      messageApi.success('Configuration is successful');
+      messageApi.success('修改视频集合成功');
       onOk?.();
     },
     onError: () => {
-      messageApi.error('Configuration failed, please try again!');
+      messageApi.error('修改视频集合失败，请重试');
     },
   });
-
-  const onCancel = useCallback(() => {
-    setOpen(false);
-  }, []);
-
-  const onOpen = useCallback(() => {
-    setOpen(true);
-  }, []);
-
-  const onFinish = useCallback(
-    async (values?: any) => {
-      await run({ data: values });
-
-      onCancel();
-    },
-    [onCancel, run],
-  );
 
   return (
     <>
       {contextHolder}
-      {trigger
-        ? cloneElement(trigger, {
-            onClick: onOpen,
-          })
-        : null}
-      <StepsForm
-        stepsProps={{
-          size: 'small',
+      <DrawerForm
+        title='修改视频集合'
+        formRef={formRef}
+        initialValues={props.values}
+        open={props.updateFormVisible}
+        width="500px"
+        // modalProps={{ okButtonProps: { loading } }}
+        onOpenChange={(visible) => {
+          if (!visible) {
+            onCancel();
+          } else {
+            formRef.current?.resetFields();
+          }
         }}
-        stepsFormRender={(dom, submitter) => {
-          return (
-            <Modal
-              width={640}
-              bodyStyle={{ padding: '32px 40px 48px' }}
-              destroyOnClose
-              title={intl.formatMessage({
-                id: 'pages.searchTable.updateForm.ruleConfig',
-                defaultMessage: '规则配置',
-              })}
-              open={open}
-              footer={submitter}
-              onCancel={onCancel}
-            >
-              {dom}
-            </Modal>
-          );
+        onFinish={async (value) => {
+          await run(props.idValue, value as VideoCollectionItem);
+          return true;
         }}
-        onFinish={onFinish}
       >
-        <StepsForm.StepForm
-          initialValues={values}
-          title={intl.formatMessage({
-            id: 'pages.searchTable.updateForm.basicConfig',
-            defaultMessage: '基本信息',
-          })}
-        >
-          <ProFormText
-            name="name"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.ruleName.nameLabel',
-              defaultMessage: '规则名称',
-            })}
-            width="md"
-            rules={[
-              {
-                required: true,
-                message: (
-                  <FormattedMessage
-                    id="pages.searchTable.updateForm.ruleName.nameRules"
-                    defaultMessage="请输入规则名称！"
-                  />
-                ),
-              },
-            ]}
-          />
-          <ProFormTextArea
-            name="desc"
-            width="md"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.ruleDesc.descLabel',
-              defaultMessage: '规则描述',
-            })}
-            placeholder={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.ruleDesc.descPlaceholder',
-              defaultMessage: '请输入至少五个字符',
-            })}
-            rules={[
-              {
-                required: true,
-                message: (
-                  <FormattedMessage
-                    id="pages.searchTable.updateForm.ruleDesc.descRules"
-                    defaultMessage="请输入至少五个字符的规则描述！"
-                  />
-                ),
-                min: 5,
-              },
-            ]}
-          />
-        </StepsForm.StepForm>
-        <StepsForm.StepForm
-          initialValues={{
-            target: '0',
-            template: '0',
-          }}
-          title={intl.formatMessage({
-            id: 'pages.searchTable.updateForm.ruleProps.title',
-            defaultMessage: '配置规则属性',
-          })}
-        >
-          <ProFormSelect
-            name="target"
-            width="md"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.object',
-              defaultMessage: '监控对象',
-            })}
-            valueEnum={{
-              0: '表一',
-              1: '表二',
-            }}
-          />
-          <ProFormSelect
-            name="template"
-            width="md"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.ruleProps.templateLabel',
-              defaultMessage: '规则模板',
-            })}
-            valueEnum={{
-              0: '规则模板一',
-              1: '规则模板二',
-            }}
-          />
-          <ProFormRadio.Group
-            name="type"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.ruleProps.typeLabel',
-              defaultMessage: '规则类型',
-            })}
-            options={[
-              {
-                value: '0',
-                label: '强',
-              },
-              {
-                value: '1',
-                label: '弱',
-              },
-            ]}
-          />
-        </StepsForm.StepForm>
-        <StepsForm.StepForm
-          initialValues={{
-            type: '1',
-            frequency: 'month',
-          }}
-          title={intl.formatMessage({
-            id: 'pages.searchTable.updateForm.schedulingPeriod.title',
-            defaultMessage: '设定调度周期',
-          })}
-        >
-          <ProFormDateTimePicker
-            name="time"
-            width="md"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.schedulingPeriod.timeLabel',
-              defaultMessage: '开始时间',
-            })}
-            rules={[
-              {
-                required: true,
-                message: (
-                  <FormattedMessage
-                    id="pages.searchTable.updateForm.schedulingPeriod.timeRules"
-                    defaultMessage="请选择开始时间！"
-                  />
-                ),
-              },
-            ]}
-          />
-          <ProFormSelect
-            name="frequency"
-            label={intl.formatMessage({
-              id: 'pages.searchTable.updateForm.object',
-              defaultMessage: '监控对象',
-            })}
-            width="md"
-            valueEnum={{
-              month: '月',
-              week: '周',
-            }}
-          />
-        </StepsForm.StepForm>
-      </StepsForm>
+        <ProFormText
+          label='集合名称'
+          rules={[
+            {
+              required: true,
+              message: ('集合名称必须输入'),
+            },
+          ]}
+          width="lg"
+          name="name"
+        />
+        <ProFormSelect
+          label='内容体裁'
+          rules={[
+            {
+              required: true,
+              message: ('内容体裁必须输入'),
+            },
+          ]}
+
+          width="lg"
+          name="contentType"
+          valueEnum={contentTypeMap}
+        />
+        <ProFormSelect
+          label='筛选方式'
+          rules={[
+            {
+              required: true,
+              message: ('筛选方式必须输入'),
+            },
+          ]}
+          width="lg"
+          name="filterType"
+          valueEnum={filterTypeMap}
+        />
+        <ProFormDigit
+          label='内容量'
+          rules={[
+            {
+              required: true,
+              message: ('内容量必须输入'),
+            },
+          ]}
+          width="lg"
+          name="count"
+        />
+        <ProFormSelect
+          label='是否上线'
+          rules={[
+            {
+              required: true,
+              message: ('是否上线必须输入'),
+            },
+          ]}
+          width="lg"
+          name="isOnline"
+          valueEnum={isOnlineMap}
+        />
+      </DrawerForm>
     </>
   );
 };

@@ -51,8 +51,8 @@ export async function listVideoCollection(
 }
 
 /** 新建视频集 PUT /api/rule */
-export async function updateVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request<VideoCollectionItem>('/v1/video-collection', {
+export async function updateVideoCollection(idValue: string, data: { [key: string]: any }, options?: { [key: string]: any }) {
+  return request<VideoCollectionItem>('/v1/video-collection/' + idValue, {
     data,
     method: 'PUT',
     ...(options || {}),
