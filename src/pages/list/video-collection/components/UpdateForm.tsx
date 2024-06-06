@@ -21,7 +21,7 @@ export type UpdateFormProps = {
 };
 
 const UpdateForm: FC<UpdateFormProps> = (props) => {
-  const { onOk, onCancel } = props;
+  const { onOk, onCancel, updateFormVisible, idValue, values } = props;
   const formRef = useRef<ProFormInstance>();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -42,8 +42,8 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
       <DrawerForm
         title='修改视频集合'
         formRef={formRef}
-        initialValues={props.values}
-        open={props.updateFormVisible}
+        initialValues={values}
+        open={updateFormVisible}
         width="500px"
         // modalProps={{ okButtonProps: { loading } }}
         onOpenChange={(visible) => {
@@ -54,7 +54,7 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
           }
         }}
         onFinish={async (value) => {
-          await run(props.idValue, value as VideoCollectionItem);
+          await run(idValue, value as VideoCollectionItem);
           return true;
         }}
       >
