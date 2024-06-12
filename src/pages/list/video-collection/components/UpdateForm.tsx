@@ -13,15 +13,15 @@ import { updateVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 
 export type UpdateFormProps = {
-  onOk?: () => void;
+  onOk: () => void;
   onCancel: () => void;
-  updateFormVisible: boolean;
+  visible: boolean;
   idValue: string;
   values: Partial<VideoCollectionItem>;
 };
 
 const UpdateForm: FC<UpdateFormProps> = (props) => {
-  const { onOk, onCancel, updateFormVisible, idValue, values } = props;
+  const { onOk, onCancel, visible, idValue, values } = props;
   const formRef = useRef<ProFormInstance>();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -43,7 +43,7 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
         title='修改视频集合'
         formRef={formRef}
         initialValues={values}
-        open={updateFormVisible}
+        open={visible}
         width="500px"
         // modalProps={{ okButtonProps: { loading } }}
         onOpenChange={(visible) => {

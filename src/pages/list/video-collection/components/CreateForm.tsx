@@ -14,11 +14,11 @@ import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-c
 import { useRequest } from "@umijs/max";
 
 interface CreateFormProps {
-  reload?: ActionType['reload'];
+  onOk?: ActionType['reload'];
 }
 
 const CreateForm: FC<CreateFormProps> = (props) => {
-  const { reload } = props;
+  const { onOk } = props;
   const formRef = useRef<ProFormInstance>();
   const [messageApi, contextHolder] = message.useMessage();
   /**
@@ -32,7 +32,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
     onSuccess: () => {
       messageApi.success('新增视频集合成功');
       formRef.current?.resetFields();
-      reload?.();
+      onOk?.();
     },
     onError: () => {
       messageApi.error('新增视频集合失败，请重试');

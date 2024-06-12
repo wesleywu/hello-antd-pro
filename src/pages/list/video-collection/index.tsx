@@ -17,7 +17,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const [updateFormVisible, handleUpdateFormVisible] = useState<boolean>(false);
+  const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [currentRow, setCurrentRow] = useState<VideoCollectionItem>();
@@ -36,11 +36,11 @@ const TableList: React.FC = () => {
     onSuccess: () => {
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-
-      messageApi.success('Deleted successfully and will refresh soon');
+      messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      setShowDetail(false);
     },
     onError: () => {
-      messageApi.error('Delete failed, please try again');
+      messageApi.error('删除视频集合记录失败，请重试');
     },
   });
 
@@ -153,7 +153,7 @@ const TableList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            handleUpdateFormVisible(true);
+            setShowUpdateForm(true);
             setCurrentRow(record);
           }}
         >
@@ -185,7 +185,7 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" reload={actionRef.current?.reload} />]}
+        toolBarRender={() => [<CreateForm key="create" onOk={actionRef.current?.reload} />]}
         request={listVideoCollection}
         columns={columns}
         pagination={{
@@ -243,10 +243,13 @@ const TableList: React.FC = () => {
       )}
       <UpdateForm
         key="修改"
-        updateFormVisible={updateFormVisible}
-        onOk={ actionRef.current?.reload }
+        visible={showUpdateForm}
+        onOk={() => {
+          actionRef.current?.reload;
+          setShowDetail(false);
+        }}
         onCancel={() => {
-          handleUpdateFormVisible(false);
+          setShowUpdateForm(false);
           setCurrentRow(undefined);
         }}
         idValue={currentRow?.id || ''}
@@ -269,7 +272,7 @@ const TableList: React.FC = () => {
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.name,
+              id: currentRow?.id,
             }}
             columns={columns as ProDescriptionsItemProps<VideoCollectionItem>[]}
           />
