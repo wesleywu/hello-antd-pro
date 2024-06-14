@@ -1,4 +1,5 @@
 export type VideoCollectionItem = {
+  key: string;
   id: string;
   name: string;
   contentType: string;
@@ -10,8 +11,8 @@ export type VideoCollectionItem = {
 };
 
 export type PageRequest = {
-  number: number;
-  size: number;
+  number?: number;
+  size?: number;
   sorts?: Sort[];
 }
 

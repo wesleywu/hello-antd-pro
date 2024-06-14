@@ -5,13 +5,17 @@ import {
   ProDescriptions,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl, useRequest } from '@umijs/max';
+import { useIntl, useRequest } from '@umijs/max';
 import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
 import React, { useCallback, useRef, useState } from 'react';
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
-import { listVideoCollection, removeVideoCollection } from "@/pages/list/video-collection/api";
+import {
+  listVideoCollection,
+  deleteVideoCollection,
+  deleteMultiVideoCollection
+} from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
@@ -31,7 +35,20 @@ const TableList: React.FC = () => {
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run: delRun, loading } = useRequest(removeVideoCollection, {
+  const { run: delRun } = useRequest(deleteVideoCollection, {
+    manual: true,
+    onSuccess: () => {
+      setSelectedRows([]);
+      actionRef.current?.reloadAndRest?.();
+      messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      setShowDetail(false);
+    },
+    onError: () => {
+      messageApi.error('删除视频集合记录失败，请重试');
+    },
+  });
+
+  const { run: delMultiRun, loading: delMultiLoading} = useRequest(deleteMultiVideoCollection, {
     manual: true,
     onSuccess: () => {
       setSelectedRows([]);
@@ -56,15 +73,12 @@ const TableList: React.FC = () => {
         messageApi.warning('请选择删除项');
         return;
       }
-      if (selectedRows?.length > 1) {
-        messageApi.warning('目前只支持删除单条记录');
-        return;
-      }
-      await delRun({
-        id: selectedRows[0].id,
+      const ids = selectedRows.map(item => item.id);
+      await delMultiRun({
+        id: ids,
       });
     },
-    [delRun],
+    [delMultiRun],
   );
 
   const columns: ProColumns<VideoCollectionItem>[] = [
@@ -189,10 +203,11 @@ const TableList: React.FC = () => {
         request={listVideoCollection}
         columns={columns}
         pagination={{
-          defaultPageSize: 2,
+          defaultPageSize: 5,
         }}
         rowSelection={{
           onChange: (_, selectedRows) => {
+            console.log(selectedRows);
             setSelectedRows(selectedRows);
           },
         }}
@@ -201,17 +216,12 @@ const TableList: React.FC = () => {
         <FooterToolbar
           extra={
             <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
+              {'已选择 '}<a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' 项'}
               &nbsp;&nbsp;
               <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.count!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
+                {'内容总量 '}
+                {selectedRowsState.reduce((pre, item) => pre + item.count!, 0)}
+                {' 万'}
               </span>
             </div>
           }
@@ -224,28 +234,17 @@ const TableList: React.FC = () => {
               handleRemove(selectedRowsState);
             }}
           >
-            <Button
-              loading={loading}
-            >
-              <FormattedMessage
-                id="pages.searchTable.batchDeletion"
-                defaultMessage="Batch deletion"
-              />
-            </Button>
+            <Button type="primary"
+              loading={delMultiLoading}
+            >批量删除</Button>
           </Popconfirm>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
         </FooterToolbar>
       )}
       <UpdateForm
         key="修改"
         visible={showUpdateForm}
         onOk={() => {
-          actionRef.current?.reload;
+          actionRef.current?.reload();
           setShowDetail(false);
         }}
         onCancel={() => {

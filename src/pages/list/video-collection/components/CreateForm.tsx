@@ -9,7 +9,7 @@ import {
 import { Button, message } from 'antd';
 import { FC, useRef } from 'react';
 import { VideoCollectionItem } from "@/pages/list/video-collection/data";
-import { addVideoCollection } from "@/pages/list/video-collection/api";
+import { createVideoCollection } from "@/pages/list/video-collection/api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
 import { useRequest } from "@umijs/max";
 
@@ -27,7 +27,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
    * */
   // const intl = useIntl();
 
-  const { run } = useRequest(addVideoCollection, {
+  const { run } = useRequest(createVideoCollection, {
     manual: true,
     onSuccess: () => {
       messageApi.success('新增视频集合成功');

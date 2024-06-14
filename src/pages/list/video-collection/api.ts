@@ -2,18 +2,19 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 import { PageInfo, VideoCollectionItem } from './data.d';
-import { MultiType, OperatorType, ProtoType, RequestParamConfig, toRequest, WildcardType } from "@/utils/requestParams";
+import { MultiType, OperatorType, ProtoType, FieldConfig, toRequest, WildcardType } from "@/utils/requestParams";
 import type { SortOrder } from "antd/lib/table/interface";
+import { transform } from "@/utils/responseTransform";
 
-export const ColumnConfigs: RequestParamConfig[] = [
-  new RequestParamConfig('id', ProtoType.ObjectID, OperatorType.EQ, MultiType.NoMulti),
-  new RequestParamConfig('name', ProtoType.StringValue, OperatorType.Like, MultiType.NoMulti, WildcardType.Contains),
-  new RequestParamConfig('contentType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
-  new RequestParamConfig('filterType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
-  new RequestParamConfig('count', ProtoType.UInt32Slice, OperatorType.EQ, MultiType.Between),
-  new RequestParamConfig('isOnline', ProtoType.BoolSlice, OperatorType.EQ, MultiType.In),
-  new RequestParamConfig('createdAt', ProtoType.DateBetween, OperatorType.EQ, MultiType.Between),
-  new RequestParamConfig('updatedAt', ProtoType.DateTimeBetween, OperatorType.EQ, MultiType.Between),
+export const ColumnConfigs: FieldConfig[] = [
+  new FieldConfig('id', ProtoType.StringValue, OperatorType.EQ, MultiType.NoMulti),
+  new FieldConfig('name', ProtoType.StringValue, OperatorType.Like, MultiType.NoMulti, WildcardType.Contains),
+  new FieldConfig('contentType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
+  new FieldConfig('filterType', ProtoType.StringSlice, OperatorType.EQ, MultiType.In),
+  new FieldConfig('count', ProtoType.UInt32Slice, OperatorType.EQ, MultiType.Between),
+  new FieldConfig('isOnline', ProtoType.BoolSlice, OperatorType.EQ, MultiType.In),
+  new FieldConfig('createdAt', ProtoType.DateBetween, OperatorType.EQ, MultiType.Between),
+  new FieldConfig('updatedAt', ProtoType.DateTimeBetween, OperatorType.EQ, MultiType.Between),
 ]
 
 /** 获取视频集列表 GET /v1/video-collection/list */
@@ -36,11 +37,15 @@ export async function listVideoCollection(
     pageInfo: PageInfo;
   }>('/v1/video-collection/list', {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
     data: data,
     ...(options || {})
   });
   return {
-    data: resp.items,
+    data: transform(resp.items, "id"),
     current: resp.pageInfo.number,
     // success 请返回 true，
     // 不然 table 会停止解析数据，即使有数据
@@ -55,29 +60,51 @@ export async function updateVideoCollection(idValue: string, data: { [key: strin
   return request<VideoCollectionItem>('/v1/video-collection/' + idValue, {
     data,
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
     ...(options || {}),
   });
 }
 
 /** 新建视频集 POST /v1/video-collection */
-export async function addVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
+export async function createVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
   console.log(data);
   return request<VideoCollectionItem>('/v1/video-collection', {
     data,
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
     ...(options || {}),
   });
 }
 
 /** 删除视频集 DELETE /v1/video-collection */
-export async function removeVideoCollection(data: { id: string }, options?: { [key: string]: any }) {
+export async function deleteVideoCollection(data: { id: string }, options?: { [key: string]: any }) {
   console.log('delete id: ' + data.id);
   return request<Record<string, any>>('/v1/video-collection/' + data.id, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'X-Requested-With1': 'XMLHttpRequest'
+      'X-Requested-With': 'XMLHttpRequest'
     },
     ...(options || {}),
+  });
+}
+
+/** 删除多个视频集 POST /v1/video-collection/delete */
+export async function deleteMultiVideoCollection(params: any) {
+  // 将 params, sort 等参数转换为服务端定义的 request 结构体
+  const data = toRequest(ColumnConfigs, params)
+  return request<Record<string, any>>('/v1/video-collection/delete', {
+    data,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
   });
 }
