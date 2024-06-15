@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "baseUrl": "./",
-    "target": "esnext",
-    "moduleResolution": "node",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "jsx": "react-jsx",
+    "sourceMap": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "strict": true,

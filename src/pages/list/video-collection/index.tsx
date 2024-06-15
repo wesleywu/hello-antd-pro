@@ -37,27 +37,27 @@ const TableList: React.FC = () => {
 
   const { run: delRun } = useRequest(deleteVideoCollection, {
     manual: true,
-    onSuccess: () => {
+    onSuccess: async () => {
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      await messageApi.success('删除视频集合记录成功，数据将很快刷新');
       setShowDetail(false);
     },
-    onError: () => {
-      messageApi.error('删除视频集合记录失败，请重试');
+    onError: async() => {
+      await messageApi.error('删除视频集合记录失败，请重试');
     },
   });
 
   const { run: delMultiRun, loading: delMultiLoading} = useRequest(deleteMultiVideoCollection, {
     manual: true,
-    onSuccess: () => {
+    onSuccess: async () => {
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      await messageApi.success('删除视频集合记录成功，数据将很快刷新');
       setShowDetail(false);
     },
-    onError: () => {
-      messageApi.error('删除视频集合记录失败，请重试');
+    onError: async () => {
+      await messageApi.error('删除视频集合记录失败，请重试');
     },
   });
 
@@ -110,7 +110,7 @@ const TableList: React.FC = () => {
       valueType: 'select',
       valueEnum: contentTypeMap,
       fieldProps: { mode: 'multiple', placeholder: 'Select one or more', },
-      render: (dom, entity) => contentTypeMap.get(entity.contentType),
+      render: ( _, entity) => contentTypeMap.get(entity.contentType),
     },
     {
       title: '筛选方式',
@@ -131,9 +131,6 @@ const TableList: React.FC = () => {
           defaultMessage: ' 万 ',
         })}`,
       hideInSearch: true,
-      // renderFormItem: () => {
-      //   return <FormDigitRange suffix="万" placeholder={['内容量最小值', '内容量最大值']} min={0} max={999999}></FormDigitRange>;
-      // },
     },
     {
       title: '是否上线',
@@ -230,8 +227,8 @@ const TableList: React.FC = () => {
             title="删除记录"
             description="确定要删除选中的记录吗？"
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-            onConfirm={() => {
-              handleRemove(selectedRowsState);
+            onConfirm={ async () => {
+              await handleRemove(selectedRowsState);
             }}
           >
             <Button type="primary"
@@ -245,11 +242,18 @@ const TableList: React.FC = () => {
         visible={showUpdateForm}
         onOk={() => {
           actionRef.current?.reload();
-          setShowDetail(false);
+          setCurrentRow(undefined);
+          // 如果 UpdateForm 由详情抽屉弹出，则需要在更新成功后关闭详情抽屉
+          if (showDetail) {
+            setShowDetail(false);
+          }
         }}
         onCancel={() => {
           setShowUpdateForm(false);
-          setCurrentRow(undefined);
+          // 如果 UpdateForm 并非由详情抽屉弹出，取消后将当前选中 currentRow 信息清空
+          if (!showDetail) {
+            setCurrentRow(undefined);
+          }
         }}
         idValue={currentRow?.id || ''}
         values={currentRow || {}}
@@ -261,7 +265,7 @@ const TableList: React.FC = () => {
           setCurrentRow(undefined);
           setShowDetail(false);
         }}
-        closable={false}
+        closable={true}
       >
         {currentRow?.name && (
           <ProDescriptions<VideoCollectionItem>

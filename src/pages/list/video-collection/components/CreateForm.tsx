@@ -29,13 +29,13 @@ const CreateForm: FC<CreateFormProps> = (props) => {
 
   const { run } = useRequest(createVideoCollection, {
     manual: true,
-    onSuccess: () => {
-      messageApi.success('新增视频集合成功');
+    onSuccess: async () => {
+      await messageApi.success('新增视频集合成功');
       formRef.current?.resetFields();
       onOk?.();
     },
-    onError: () => {
-      messageApi.error('新增视频集合失败，请重试');
+    onError: async () => {
+      await messageApi.error('新增视频集合失败，请重试');
     },
   });
 

@@ -27,12 +27,12 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
 
   const { run } = useRequest(updateVideoCollection, {
     manual: true,
-    onSuccess: () => {
-      messageApi.success('修改视频集合成功');
+    onSuccess: async () => {
+      await messageApi.success('修改视频集合成功');
       onOk?.();
     },
-    onError: () => {
-      messageApi.error('修改视频集合失败，请重试');
+    onError: async () => {
+      await messageApi.error('修改视频集合失败，请重试');
     },
   });
 

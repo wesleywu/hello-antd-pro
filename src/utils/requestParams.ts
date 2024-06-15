@@ -2,60 +2,13 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone"
 import type { SortOrder } from "antd/lib/table/interface";
-import { PageRequest, Sort } from "@/pages/list/video-collection/data";
+import { PageRequest, Sort } from "@/utils/types.d";
 import { toCondition } from "@/utils/conditionGenerator";
+import { MultiType, OperatorType, ProtoType, WildcardType } from "./types.d";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-export enum ProtoType {
-  DoubleValue,
-  FloatValue,
-  Int64Value,
-  UInt64Value,
-  Int32Value,
-  UInt32Value,
-  BoolValue,
-  StringValue,
-  DoubleSlice,
-  FloatSlice,
-  Int64Slice,
-  UInt64Slice,
-  Int32Slice,
-  UInt32Slice,
-  BoolSlice,
-  StringSlice,
-  DateBetween,
-  DateTimeBetween,
-}
-
-export enum OperatorType {
-  EQ = 'EQ',
-  NE = 'NE',
-  GT = 'GT',
-  GTE = 'GTE',
-  LT = 'LT',
-  LTE = 'LTE',
-  Like = 'Like',
-  NotLike = 'NotLike',
-  Null = 'Null',
-  NotNull = 'NotNull',
-}
-
-export enum MultiType {
-  NoMulti = 'NoMulti',
-  Between = 'Between',
-  NotBetween = 'NotBetween',
-  In = 'In',
-  NotIn = 'NotIn',
-}
-
-export enum WildcardType {
-  NoWildcard = 'NoWildcard',
-  Contains = 'Contains',
-  StartsWith = 'StartsWith',
-  EndsWith = 'EndsWith',
-}
 
 export class FieldConfig {
   name: string;
