@@ -50,7 +50,7 @@ export async function listVideoCollection(
 export async function updateVideoCollection(idValue: string, data: { [key: string]: any }, options?: { [key: string]: any }) {
   return request('/v1/video-collection/' + idValue, {
     data,
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest'
