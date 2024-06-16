@@ -71,7 +71,6 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
               message: ('内容体裁必须输入'),
             },
           ]}
-
           width="lg"
           name="contentType"
           valueEnum={contentTypeMap}
