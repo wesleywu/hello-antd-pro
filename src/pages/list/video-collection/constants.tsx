@@ -9,10 +9,12 @@ export const contentTypeMap: Map<string, React.ReactNode> = new Map([
   ['LandscapeVideo', (<div key={2}><BorderHorizontalOutlined /> 竖版短视频</div>)],
   ['PortraitVideo', (<div key={9}><BorderVerticleOutlined/> 横版短视频</div>)],
 ]);
+
 export const filterTypeMap: Map<string, string> = new Map([
   ['Ruled', '规则筛选'],
   ['Manual', '人工'],
 ]);
+
 export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
   [false, {
     text: '未上线',

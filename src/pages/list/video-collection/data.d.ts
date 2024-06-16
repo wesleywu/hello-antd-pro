@@ -1,4 +1,4 @@
-export type VideoCollectionItem = {
+export type VideoCollection = {
   key: string;
   id: string;
   name: string;

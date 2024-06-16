@@ -2,7 +2,7 @@ import { FC, useRef } from 'react';
 import { useRequest } from '@umijs/max';
 import { message } from 'antd';
 import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { VideoCollectionItem } from "../data";
+import { VideoCollection } from "../data";
 import { updateVideoCollection } from "../api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
 
@@ -11,7 +11,7 @@ export type UpdateFormProps = {
   onCancel: () => void;
   visible: boolean;
   idValue: string;
-  values: Partial<VideoCollectionItem>;
+  values: Partial<VideoCollection>;
 };
 
 const UpdateForm: FC<UpdateFormProps> = (props) => {
@@ -48,7 +48,7 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
           }
         }}
         onFinish={async (value) => {
-          await run(idValue, value as VideoCollectionItem);
+          await run(idValue, value as VideoCollection);
           return true;
         }}
       >

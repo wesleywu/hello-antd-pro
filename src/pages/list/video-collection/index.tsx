@@ -1,78 +1,77 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useIntl, useRequest } from '@umijs/max';
+import { useRequest } from '@umijs/max';
 import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
 import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { VideoCollectionItem } from "./data";
+import { VideoCollection } from "./data";
 import { listVideoCollection, deleteVideoCollection, deleteMultiVideoCollection } from "./api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 
-const TableList: React.FC = () => {
+const VideoCollectionListPage: React.FC = () => {
+  // 刷新表格的actionRef
   const actionRef = useRef<ActionType>();
+  // 显示更新表单抽屉的开关
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
-
+  // 显示详情抽屉的开关
   const [showDetail, setShowDetail] = useState<boolean>(false);
-  const [currentRow, setCurrentRow] = useState<VideoCollectionItem>();
-  const [selectedRowsState, setSelectedRows] = useState<VideoCollectionItem[]>([]);
-
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
+  // 当前行
+  const [currentRow, setCurrentRow] = useState<VideoCollection>();
+  // 选中行
+  const [selectedRows, setSelectedRows] = useState<VideoCollection[]>([]);
 
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run: delRun } = useRequest(deleteVideoCollection, {
+  const { run: deleteSingleRow } = useRequest(deleteVideoCollection, {
     manual: true,
     onSuccess: async () => {
+      messageApi.success('删除视频集合记录成功');
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      await messageApi.success('删除视频集合记录成功');
       setShowDetail(false);
     },
     onError: async() => {
-      await messageApi.error('删除视频集合记录失败，请重试');
+      messageApi.error('删除视频集合记录失败，请重试');
     },
   });
 
-  const { run: delMultiRun, loading: delMultiLoading} = useRequest(deleteMultiVideoCollection, {
+  const { run: deleteMultiRows, loading: deleteMultiRowsLoading} = useRequest(deleteMultiVideoCollection, {
     manual: true,
     onSuccess: async () => {
+      messageApi.success('删除视频集合记录成功');
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      await messageApi.success('删除视频集合记录成功');
       setShowDetail(false);
     },
     onError: async () => {
-      await messageApi.error('删除视频集合记录失败，请重试');
+      messageApi.error('删除视频集合记录失败，请重试');
     },
   });
 
   /**
-   *  Delete node
-   * @zh-CN 删除节点
-   *
+   * 处理删除多条记录的逻辑
    * @param selectedRows
    */
   const handleRemove = useCallback(
-    async (selectedRows: VideoCollectionItem[]) => {
+    async (selectedRows: VideoCollection[]) => {
       if (!selectedRows?.length) {
         messageApi.warning('请选择删除项');
         return;
       }
       const ids = selectedRows.map(item => item.id);
-      await delMultiRun({
+      await deleteMultiRows({
         id: ids,
       });
     },
-    [delMultiRun],
+    [deleteMultiRows],
   );
 
-  const columns: ProColumns<VideoCollectionItem>[] = [
+  /**
+   * 定义表格显示的列
+   */
+  const columns: ProColumns<VideoCollection>[] = [
     {
       title: '集合编号',
       dataIndex: 'id',
@@ -117,10 +116,7 @@ const TableList: React.FC = () => {
       sorter: true,
       hideInForm: true,
       renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
+        `${val} 万`,
       hideInSearch: true,
     },
     {
@@ -166,7 +162,7 @@ const TableList: React.FC = () => {
           title="删除记录"
           description="确定要删除这条记录吗？"
           icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
-          onConfirm={() => delRun({id: record.id})}
+          onConfirm={() => deleteSingleRow({id: record.id})}
         >
           <a key='delete'> 删除 </a>
         </Popconfirm>
@@ -177,11 +173,8 @@ const TableList: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<VideoCollectionItem>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
+      <ProTable<VideoCollection>
+        headerTitle='视频集合列表'
         actionRef={actionRef}
         rowKey="key"
         search={{
@@ -195,20 +188,19 @@ const TableList: React.FC = () => {
         }}
         rowSelection={{
           onChange: (_, selectedRows) => {
-            console.log(selectedRows);
             setSelectedRows(selectedRows);
           },
         }}
       />
-      {selectedRowsState?.length > 0 && (
+      {selectedRows?.length > 0 && (
         <FooterToolbar
           extra={
             <div>
-              {'已选择 '}<a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' 项'}
+              {'已选择 '}<a style={{ fontWeight: 600 }}>{selectedRows.length}</a>{' 项'}
               &nbsp;&nbsp;
               <span>
                 {'内容总量 '}
-                {selectedRowsState.reduce((pre, item) => pre + item.count!, 0)}
+                {selectedRows.reduce((pre, item) => pre + item.count!, 0)}
                 {' 万'}
               </span>
             </div>
@@ -219,11 +211,11 @@ const TableList: React.FC = () => {
             description="确定要删除选中的记录吗？"
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
             onConfirm={ async () => {
-              await handleRemove(selectedRowsState);
+              await handleRemove(selectedRows);
             }}
           >
             <Button type="primary"
-              loading={delMultiLoading}
+              loading={deleteMultiRowsLoading}
             >批量删除</Button>
           </Popconfirm>
         </FooterToolbar>
@@ -259,7 +251,7 @@ const TableList: React.FC = () => {
         closable={true}
       >
         {currentRow?.name && (
-          <ProDescriptions<VideoCollectionItem>
+          <ProDescriptions<VideoCollection>
             column={2}
             title={currentRow?.name}
             request={async () => ({
@@ -268,7 +260,7 @@ const TableList: React.FC = () => {
             params={{
               id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<VideoCollectionItem>[]}
+            columns={columns as ProDescriptionsItemProps<VideoCollection>[]}
           />
         )}
       </Drawer>
@@ -276,4 +268,4 @@ const TableList: React.FC = () => {
   );
 };
 
-export default TableList;
+export default VideoCollectionListPage;

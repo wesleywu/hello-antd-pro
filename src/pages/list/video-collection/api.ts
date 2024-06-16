@@ -1,14 +1,14 @@
-// @ts-ignore
-/* eslint-disable */
 import { request } from '@umijs/max';
 import type { SortOrder } from "antd/lib/table/interface";
 import { ListRes } from "@/utils/types";
 import { toRequest } from "@/utils/requestParams";
 import { populateKeyWithId } from "@/utils/responseInterceptors";
-import { VideoCollectionItem } from './data.d';
+import { VideoCollection } from './data.d';
 import { VideoCollectionDeleteFieldConfigs, VideoCollectionSearchFieldConfigs } from './constants';
 
-/** 获取视频集列表 GET /v1/video-collection/list */
+const apiBaseVideoCollection = '/v1/video-collection';
+
+/** 获取视频集列表 POST /v1/video-collection/list */
 export async function listVideoCollection(
   params: {
     // query
@@ -22,7 +22,7 @@ export async function listVideoCollection(
 ) {
   // 将 params, sort 等参数转换为服务端定义的 request 结构体
   const data = toRequest(VideoCollectionSearchFieldConfigs, params, params.current ? params.current : 1, params.pageSize ? params.pageSize : 10, sort)
-  const resp = await request<ListRes<VideoCollectionItem>>('/v1/video-collection/list', {
+  const resp = await request<ListRes<VideoCollection>>(`${apiBaseVideoCollection}/list`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -43,9 +43,9 @@ export async function listVideoCollection(
   };
 }
 
-/** 新建视频集 PUT /api/rule */
+/** 更新视频集 PATCH /v1/video-collection/$id */
 export async function updateVideoCollection(idValue: string, data: { [key: string]: any }, options?: { [key: string]: any }) {
-  return request('/v1/video-collection/' + idValue, {
+  return request(`${apiBaseVideoCollection}/${idValue}`, {
     data,
     method: 'PATCH',
     headers: {
@@ -58,8 +58,8 @@ export async function updateVideoCollection(idValue: string, data: { [key: strin
 
 /** 新建视频集 POST /v1/video-collection */
 export async function createVideoCollection(data: { [key: string]: any }, options?: { [key: string]: any }) {
-  console.log(data);
-  return request('/v1/video-collection', {
+  // console.log(data);
+  return request(`${apiBaseVideoCollection}`, {
     data,
     method: 'POST',
     headers: {
@@ -70,9 +70,9 @@ export async function createVideoCollection(data: { [key: string]: any }, option
   });
 }
 
-/** 删除视频集 DELETE /v1/video-collection */
+/** 删除视频集 DELETE /v1/video-collection/$id */
 export async function deleteVideoCollection(data: { id: string }, options?: { [key: string]: any }) {
-  return request('/v1/video-collection/' + data.id, {
+  return request(`${apiBaseVideoCollection}/${data.id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export async function deleteVideoCollection(data: { id: string }, options?: { [k
 export async function deleteMultiVideoCollection(params: any) {
   // 将 params, sort 等参数转换为服务端定义的 request 结构体
   const data = toRequest(VideoCollectionDeleteFieldConfigs, params)
-  return request('/v1/video-collection/delete', {
+  return request(`${apiBaseVideoCollection}/delete`, {
     data,
     method: 'POST',
     headers: {

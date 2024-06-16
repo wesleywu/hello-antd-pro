@@ -2,7 +2,7 @@ import { FC, useRef } from 'react';
 import { Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { VideoCollectionItem } from "../data";
+import { VideoCollection } from "../data";
 import { createVideoCollection } from "../api";
 import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
 import { useRequest } from "@umijs/max";
@@ -45,7 +45,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
         width="500px"
         // modalProps={{ okButtonProps: { loading } }}
         onFinish={async (value) => {
-          await run(value as VideoCollectionItem);
+          await run(value as VideoCollection);
           return true;
         }}
       >
