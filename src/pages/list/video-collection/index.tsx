@@ -40,7 +40,7 @@ const TableList: React.FC = () => {
     onSuccess: async () => {
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      await messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      await messageApi.success('删除视频集合记录成功');
       setShowDetail(false);
     },
     onError: async() => {
@@ -53,7 +53,7 @@ const TableList: React.FC = () => {
     onSuccess: async () => {
       setSelectedRows([]);
       actionRef.current?.reloadAndRest?.();
-      await messageApi.success('删除视频集合记录成功，数据将很快刷新');
+      await messageApi.success('删除视频集合记录成功');
       setShowDetail(false);
     },
     onError: async () => {
@@ -196,7 +196,7 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" onOk={actionRef.current?.reload} />]}
+        toolBarRender={() => [<CreateForm key="create" onOk={actionRef.current?.reloadAndRest} />]}
         request={listVideoCollection}
         columns={columns}
         pagination={{
