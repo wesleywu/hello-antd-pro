@@ -7,7 +7,7 @@ import {
   conditionStringValue
 } from '@/utils/conditionGenerator';
 import { FieldConfig } from "@/utils/requestParams";
-import { MultiType, OperatorType, ProtoType } from "@/utils/types.d"
+import { MultiType, OperatorType, ProtoType } from "@/utils/types"
 import dayjs from "dayjs";
 
 describe("testing conditionNumberValue with various number value", () => {

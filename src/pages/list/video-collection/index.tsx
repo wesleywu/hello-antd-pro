@@ -1,23 +1,14 @@
-import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
-import {
-  FooterToolbar,
-  PageContainer,
-  ProDescriptions,
-  ProTable,
-} from '@ant-design/pro-components';
+import React, { useCallback, useRef, useState } from 'react';
 import { useIntl, useRequest } from '@umijs/max';
 import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
-import React, { useCallback, useRef, useState } from 'react';
+import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
+import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { VideoCollectionItem } from "./data";
+import { listVideoCollection, deleteVideoCollection, deleteMultiVideoCollection } from "./api";
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
-import { VideoCollectionItem } from "@/pages/list/video-collection/data";
-import {
-  listVideoCollection,
-  deleteVideoCollection,
-  deleteMultiVideoCollection
-} from "@/pages/list/video-collection/api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
-import { QuestionCircleOutlined } from "@ant-design/icons";
 
 const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();

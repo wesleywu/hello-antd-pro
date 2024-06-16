@@ -2,9 +2,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone"
 import type { SortOrder } from "antd/lib/table/interface";
-import { PageRequest, Sort } from "@/utils/types.d";
 import { toCondition } from "@/utils/conditionGenerator";
-import { MultiType, OperatorType, ProtoType, WildcardType } from "./types.d";
+import { PageRequest, Sort, MultiType, OperatorType, ProtoType, WildcardType } from "./types";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

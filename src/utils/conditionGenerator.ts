@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { FieldConfig } from "./requestParams";
-import { MultiType, OperatorType, ProtoType } from "./types.d";
+import { MultiType, OperatorType, ProtoType } from "./types";
 
 const singleProtoTypeMapping = new Map<ProtoType, string>([
   [ProtoType.DoubleValue, 'google.protobuf.DoubleValue'],

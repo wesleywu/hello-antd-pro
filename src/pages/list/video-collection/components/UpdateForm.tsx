@@ -1,16 +1,10 @@
-import {
-  DrawerForm,
-  ProFormDigit,
-  ProFormInstance,
-  ProFormSelect,
-  ProFormText,
-} from '@ant-design/pro-components';
+import { FC, useRef } from 'react';
 import { useRequest } from '@umijs/max';
 import { message } from 'antd';
-import { FC, useRef } from 'react';
-import { VideoCollectionItem } from "@/pages/list/video-collection/data";
-import { updateVideoCollection } from "@/pages/list/video-collection/api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
+import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
+import { VideoCollectionItem } from "../data";
+import { updateVideoCollection } from "../api";
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
 
 export type UpdateFormProps = {
   onOk: () => void;
@@ -28,11 +22,11 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
   const { run } = useRequest(updateVideoCollection, {
     manual: true,
     onSuccess: async () => {
-      await messageApi.success('修改视频集合成功');
+      messageApi.success('修改视频集合成功');
       onOk?.();
     },
     onError: async () => {
-      await messageApi.error('修改视频集合失败，请重试');
+      messageApi.error('修改视频集合失败，请重试');
     },
   });
 

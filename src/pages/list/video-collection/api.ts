@@ -1,15 +1,12 @@
 // @ts-ignore
 /* eslint-disable */
 import { request } from '@umijs/max';
-import {
-  VideoCollectionItem,
-  VideoCollectionDeleteFieldConfigs,
-  VideoCollectionSearchFieldConfigs
-} from './data.d';
-import { ListRes } from "@/utils/types.d";
-import { toRequest } from "@/utils/requestParams";
 import type { SortOrder } from "antd/lib/table/interface";
+import { ListRes } from "@/utils/types";
+import { toRequest } from "@/utils/requestParams";
 import { populateKeyWithId } from "@/utils/responseInterceptors";
+import { VideoCollectionItem } from './data.d';
+import { VideoCollectionDeleteFieldConfigs, VideoCollectionSearchFieldConfigs } from './constants';
 
 /** 获取视频集列表 GET /v1/video-collection/list */
 export async function listVideoCollection(

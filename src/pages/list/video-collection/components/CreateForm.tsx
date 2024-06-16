@@ -1,16 +1,10 @@
-import { PlusOutlined } from '@ant-design/icons';
-import {
-  ActionType,
-  DrawerForm,
-  ProFormDigit, ProFormInstance,
-  ProFormSelect,
-  ProFormText,
-} from '@ant-design/pro-components';
-import { Button, message } from 'antd';
 import { FC, useRef } from 'react';
-import { VideoCollectionItem } from "@/pages/list/video-collection/data";
-import { createVideoCollection } from "@/pages/list/video-collection/api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "@/pages/list/video-collection/constants";
+import { Button, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { ActionType, DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
+import { VideoCollectionItem } from "../data";
+import { createVideoCollection } from "../api";
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
 import { useRequest } from "@umijs/max";
 
 interface CreateFormProps {
@@ -30,12 +24,12 @@ const CreateForm: FC<CreateFormProps> = (props) => {
   const { run } = useRequest(createVideoCollection, {
     manual: true,
     onSuccess: async () => {
-      await messageApi.success('新增视频集合成功');
+      messageApi.success('新增视频集合成功');
       formRef.current?.resetFields();
       onOk?.();
     },
     onError: async () => {
-      await messageApi.error('新增视频集合失败，请重试');
+      messageApi.error('新增视频集合失败，请重试');
     },
   });
 
