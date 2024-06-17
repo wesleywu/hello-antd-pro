@@ -2,20 +2,20 @@ import { FC, useRef } from 'react';
 import { useRequest } from '@umijs/max';
 import { message } from 'antd';
 import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { VideoCollection } from "../data";
+import { VideoCollection } from "../constants";
 import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
 
 export type UpdateFormProps = {
   onOk?: () => void;
   onCancel?: () => void;
+  getValues?: () => Partial<VideoCollection>;
   visible: boolean;
   idValue: string;
-  values: Partial<VideoCollection>;
 };
 
 const UpdateForm: FC<UpdateFormProps> = (props) => {
   // 修改成功、取消后触发的回调
-  const { onOk, onCancel, visible, idValue, values } = props;
+  const { onOk, onCancel, getValues, visible, idValue } = props;
   // form 的数据
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
@@ -38,15 +38,13 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
       <DrawerForm
         title='修改视频集合'
         formRef={formRef}
-        initialValues={values}
         open={visible}
         width="500px"
-        // modalProps={{ okButtonProps: { loading } }}
         onOpenChange={(visible) => {
           if (!visible) {
             onCancel?.();
           } else {
-            formRef.current?.resetFields();
+            formRef?.current?.setFieldsValue(getValues?.());
           }
         }}
         onFinish={async (value) => {

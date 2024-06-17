@@ -2,8 +2,7 @@ import { FC, useRef } from 'react';
 import { Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { VideoCollection } from "../data";
-import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
+import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
 import { useRequest } from "@umijs/max";
 
 interface CreateFormProps {

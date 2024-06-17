@@ -4,8 +4,7 @@ import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
 import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { VideoCollection } from "./data";
-import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "./constants";
+import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "./constants";
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 
@@ -150,8 +149,12 @@ const VideoCollectionListPage: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            setShowUpdateForm(true);
             setCurrentRow(record);
+            // 如果 UpdateForm 由详情抽屉弹出，则需要先关闭详情抽屉
+            if (showDetail) {
+              setShowDetail(false);
+            }
+            setShowUpdateForm(true);
           }}
         >
           修改
@@ -227,20 +230,12 @@ const VideoCollectionListPage: React.FC = () => {
         onOk={() => {
           actionRef.current?.reload();
           setCurrentRow(undefined);
-          // 如果 UpdateForm 由详情抽屉弹出，则需要在更新成功后关闭详情抽屉
-          if (showDetail) {
-            setShowDetail(false);
-          }
         }}
         onCancel={() => {
           setShowUpdateForm(false);
-          // 如果 UpdateForm 并非由详情抽屉弹出，取消后将当前选中 currentRow 信息清空
-          if (!showDetail) {
-            setCurrentRow(undefined);
-          }
         }}
         idValue={currentRow?.id || ''}
-        values={currentRow || {}}
+        getValues={() => currentRow || {} }
       />,
       <Drawer
         width={600}

@@ -4,7 +4,6 @@ import { ProSchemaValueEnumType } from "@ant-design/pro-provider";
 import { FieldConfig } from "@/utils/requestParams";
 import { MultiType, OperatorType, ProtoType, WildcardType } from "@/utils/types";
 import { CrudApi } from "@/utils/crudApi";
-import { VideoCollection } from "@/pages/list/video-collection/data";
 
 // contentType 字段的显示转换速查表
 export const contentTypeMap: Map<string, React.ReactNode> = new Map([
@@ -33,6 +32,18 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
 
 // api base
 const videoCollectionApiBase = '/v1/video-collection';
+
+export class VideoCollection {
+  key: string;
+  id: string;
+  name: string;
+  contentType: string;
+  filterType: string;
+  count: number;
+  isOnline: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 // 查询记录使用的字段配置表
 const videoCollectionSearchFieldConfigs: FieldConfig[] = [
