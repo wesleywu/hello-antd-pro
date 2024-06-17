@@ -3,23 +3,25 @@ import { useRequest } from '@umijs/max';
 import { message } from 'antd';
 import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { VideoCollection } from "../data";
-import { updateVideoCollection } from "../api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
+import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
 
 export type UpdateFormProps = {
-  onOk: () => void;
-  onCancel: () => void;
+  onOk?: () => void;
+  onCancel?: () => void;
   visible: boolean;
   idValue: string;
   values: Partial<VideoCollection>;
 };
 
 const UpdateForm: FC<UpdateFormProps> = (props) => {
+  // 修改成功、取消后触发的回调
   const { onOk, onCancel, visible, idValue, values } = props;
+  // form 的数据
   const formRef = useRef<ProFormInstance>();
+  // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run } = useRequest(updateVideoCollection, {
+  const { run } = useRequest(videoCollectionApi.update, {
     manual: true,
     onSuccess: async () => {
       messageApi.success('修改视频集合成功');
@@ -42,7 +44,7 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
         // modalProps={{ okButtonProps: { loading } }}
         onOpenChange={(visible) => {
           if (!visible) {
-            onCancel();
+            onCancel?.();
           } else {
             formRef.current?.resetFields();
           }

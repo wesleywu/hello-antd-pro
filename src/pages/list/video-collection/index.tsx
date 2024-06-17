@@ -5,8 +5,7 @@ import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pr
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { VideoCollection } from "./data";
-import { listVideoCollection, deleteVideoCollection, deleteMultiVideoCollection } from "./api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
+import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "./constants";
 import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
 
@@ -21,10 +20,10 @@ const VideoCollectionListPage: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<VideoCollection>();
   // 选中行
   const [selectedRows, setSelectedRows] = useState<VideoCollection[]>([]);
-
+  // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
 
-  const { run: deleteSingleRow } = useRequest(deleteVideoCollection, {
+  const { run: deleteSingleRow } = useRequest(videoCollectionApi.delete, {
     manual: true,
     onSuccess: async () => {
       messageApi.success('删除视频集合记录成功');
@@ -37,7 +36,7 @@ const VideoCollectionListPage: React.FC = () => {
     },
   });
 
-  const { run: deleteMultiRows, loading: deleteMultiRowsLoading} = useRequest(deleteMultiVideoCollection, {
+  const { run: deleteMultiRows, loading: deleteMultiRowsLoading} = useRequest(videoCollectionApi.deleteMulti, {
     manual: true,
     onSuccess: async () => {
       messageApi.success('删除视频集合记录成功');
@@ -173,15 +172,17 @@ const VideoCollectionListPage: React.FC = () => {
   return (
     <PageContainer>
       {contextHolder}
-      <ProTable<VideoCollection>
+      <ProTable<VideoCollection, VideoCollection>
         headerTitle='视频集合列表'
         actionRef={actionRef}
         rowKey="key"
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" onOk={actionRef.current?.reloadAndRest} />]}
-        request={listVideoCollection}
+        toolBarRender={() => [<CreateForm key="create" onOk={() => {
+          actionRef.current?.reload();
+        }} />]}
+        request={videoCollectionApi.list}
         columns={columns}
         pagination={{
           defaultPageSize: 5,

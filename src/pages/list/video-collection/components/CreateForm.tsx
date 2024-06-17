@@ -1,19 +1,21 @@
 import { FC, useRef } from 'react';
 import { Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { ActionType, DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
+import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { VideoCollection } from "../data";
-import { createVideoCollection } from "../api";
-import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
+import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
 import { useRequest } from "@umijs/max";
 
 interface CreateFormProps {
-  onOk?: ActionType['reload'];
+  onOk?: () => void;
 }
 
 const CreateForm: FC<CreateFormProps> = (props) => {
+  // 新增成功后触发的回调
   const { onOk } = props;
+  // form 的数据
   const formRef = useRef<ProFormInstance>();
+  // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
   /**
    * @en-US International configuration
@@ -21,7 +23,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
    * */
   // const intl = useIntl();
 
-  const { run } = useRequest(createVideoCollection, {
+  const { run } = useRequest(videoCollectionApi.create, {
     manual: true,
     onSuccess: async () => {
       messageApi.success('新增视频集合成功');
@@ -45,6 +47,7 @@ const CreateForm: FC<CreateFormProps> = (props) => {
         width="500px"
         // modalProps={{ okButtonProps: { loading } }}
         onFinish={async (value) => {
+          console.log(value);
           await run(value as VideoCollection);
           return true;
         }}

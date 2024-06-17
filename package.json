@@ -48,7 +48,7 @@
     "antd": "^5.12.7",
     "antd-style": "^3.6.1",
     "classnames": "^2.5.1",
-    "dayjs": "^1.11.10",
+    "dayjs": "^1.11.11",
     "numeral": "^2.0.6",
     "omit.js": "^2.0.2",
     "querystring": "^0.2.1",
