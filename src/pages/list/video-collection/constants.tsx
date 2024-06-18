@@ -1,9 +1,10 @@
 import React from "react";
 import { BorderHorizontalOutlined, BorderVerticleOutlined, FileTextOutlined } from "@ant-design/icons";
 import { ProSchemaValueEnumType } from "@ant-design/pro-provider";
-import { FieldConfig } from "@/utils/requestParams";
 import { MultiType, OperatorType, ProtoType, WildcardType } from "@/utils/types";
-import { CrudApi } from "@/utils/crudApi";
+import { field, search } from "@/utils/decorators";
+import { Crud } from "@/utils/crud";
+import "reflect-metadata";
 
 // contentType 字段的显示转换速查表
 export const contentTypeMap: Map<string, React.ReactNode> = new Map([
@@ -30,37 +31,29 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
   }],
 ]);
 
-// api base
-const videoCollectionApiBase = '/v1/video-collection';
-
+// 表字段定义
 export class VideoCollection {
-  key: string;
+  @field("_id", ProtoType.StringValue)
   id: string;
+  @field("name", ProtoType.StringValue)
+  @search(OperatorType.Like, MultiType.NoMulti, WildcardType.Contains)
   name: string;
+  @field("content_type", ProtoType.StringValue)
+  // @search(OperatorType.EQ, MultiType.In)
   contentType: string;
+  @field("filter_type", ProtoType.StringValue)
+  // @search(OperatorType.EQ, MultiType.In)
   filterType: string;
+  @field("count", ProtoType.Int32Value)
   count: number;
+  @field("is_online", ProtoType.BoolValue)
   isOnline: boolean;
+  @field("created_at", ProtoType.Date)
+  // @search(OperatorType.EQ, MultiType.Between)
   createdAt: Date;
+  @field("updated_at", ProtoType.Date)
   updatedAt: Date;
 }
 
-// 查询记录使用的字段配置表
-const videoCollectionSearchFieldConfigs: FieldConfig[] = [
-  new FieldConfig('id', ProtoType.StringValue, OperatorType.EQ, MultiType.NoMulti),
-  new FieldConfig('name', ProtoType.StringValue, OperatorType.Like, MultiType.NoMulti, WildcardType.Contains),
-  new FieldConfig('contentType', ProtoType.StringValue, OperatorType.EQ, MultiType.In),
-  new FieldConfig('filterType', ProtoType.StringValue, OperatorType.EQ, MultiType.In),
-  new FieldConfig('count', ProtoType.UInt32Value, OperatorType.EQ, MultiType.Between),
-  new FieldConfig('isOnline', ProtoType.BoolValue, OperatorType.EQ, MultiType.In),
-  new FieldConfig('createdAt', ProtoType.Date, OperatorType.EQ, MultiType.Between),
-  new FieldConfig('updatedAt', ProtoType.Date, OperatorType.EQ, MultiType.Between),
-]
-
-// 删除多条记录使用的字段配置表
-const videoCollectionDeleteFieldConfigs: FieldConfig[] = [
-  new FieldConfig('id', ProtoType.StringValue, OperatorType.EQ, MultiType.In),
-]
-
 // 后端 api
-export const videoCollectionApi = new CrudApi<VideoCollection>(videoCollectionApiBase, videoCollectionSearchFieldConfigs, videoCollectionDeleteFieldConfigs);
+export const videoCollectionApi = new Crud(VideoCollection, '/v1/video-collection');

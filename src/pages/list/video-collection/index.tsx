@@ -185,7 +185,7 @@ const VideoCollectionListPage: React.FC = () => {
         toolBarRender={() => [<CreateForm key="create" onOk={() => {
           actionRef.current?.reload();
         }} />]}
-        request={videoCollectionApi.list}
+        request={videoCollectionApi.list<VideoCollection>}
         columns={columns}
         pagination={{
           defaultPageSize: 5,
