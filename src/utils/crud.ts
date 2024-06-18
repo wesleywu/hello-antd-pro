@@ -164,7 +164,7 @@ export class Crud {
       }
       conditions.push(condition);
     }
-    if (pageNum !== null && pageSize !== null) {
+    if (pageNum !== undefined && pageSize !== undefined) {
       const pageRequest: PageRequest = {
         number: pageNum,
         size: pageSize,
@@ -175,13 +175,17 @@ export class Crud {
           if (!Object.hasOwn(sort, field)) {
             continue
           }
+          const fieldConfig = this.fieldConfigs.get(field);
+          if (fieldConfig === undefined) {
+            continue
+          }
           const order = sort[field];
           let orderDirection = 'Asc'
           if (order === 'descend') {
             orderDirection = 'Desc';
           }
           sorts.push({
-            property: field,
+            property: fieldConfig.dbColumnName,
             direction: orderDirection,
           })
         }
