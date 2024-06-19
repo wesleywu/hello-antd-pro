@@ -73,22 +73,22 @@ const VideoCollectionListPage: React.FC = () => {
    * 定义表格显示的列
    */
   const columns: ProColumns<VideoCollection>[] = [
-    {
-      title: '集合编号',
-      dataIndex: 'id',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
-    },
+    // {
+    //   title: '集合编号',
+    //   dataIndex: 'id',
+    //   render: (dom, entity) => {
+    //     return (
+    //       <a
+    //         onClick={() => {
+    //           setCurrentRow(entity);
+    //           setShowDetail(true);
+    //         }}
+    //       >
+    //         {dom}
+    //       </a>
+    //     );
+    //   },
+    // },
     {
       title: '集合名称',
       dataIndex: 'name',
@@ -192,6 +192,12 @@ const VideoCollectionListPage: React.FC = () => {
         columns={columns}
         pagination={{
           defaultPageSize: 5,
+        }}
+        onRow={record => {
+          return { onClick: () => {
+            setCurrentRow(record);
+            setShowDetail(true);
+          }};
         }}
         rowSelection={{
           onChange: (_, selectedRows) => {
