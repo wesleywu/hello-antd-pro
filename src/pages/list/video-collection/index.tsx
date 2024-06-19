@@ -4,9 +4,10 @@ import { Button, DatePicker, Drawer, message, Popconfirm } from 'antd';
 import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "./constants";
+import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
 import UpdateForm from './components/UpdateForm';
 import { CreateForm } from "@/components/CreateForm";
+import { CrudApiFactory } from "@/utils/crud";
 
 const VideoCollectionListPage: React.FC = () => {
   // 刷新表格的actionRef
@@ -21,6 +22,8 @@ const VideoCollectionListPage: React.FC = () => {
   const [selectedRows, setSelectedRows] = useState<VideoCollection[]>([]);
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
+  // crud api
+  const videoCollectionApi = CrudApiFactory.get(VideoCollection);
 
   const { run: deleteSingleRow } = useRequest(videoCollectionApi.delete, {
     manual: true,
@@ -182,7 +185,7 @@ const VideoCollectionListPage: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" poClass={VideoCollection} crudApi={videoCollectionApi} onOk={() => {
+        toolBarRender={() => [<CreateForm key="create" poClass={VideoCollection} onOk={() => {
           actionRef.current?.reload();
         }} />]}
         request={videoCollectionApi.list<VideoCollection>}

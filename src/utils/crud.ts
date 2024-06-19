@@ -23,11 +23,19 @@ function populateKeyWithId(response: AxiosResponse) {
 }
 
 export function getFieldConfigs(table: Class): Map<string, FieldConfig> {
-  return table.prototype[FIELD_CONFIGS] as Map<string, FieldConfig>;
+  const configMap = table.prototype[FIELD_CONFIGS] as Map<string, FieldConfig>;
+  if (configMap === undefined) {
+    throw new Error(`没有数据类 ${table.name} 的属性上使用 @field 装饰器定义元数据`);
+  }
+  return configMap;
 }
 
 export function getSearchConfigs(table: Class): Map<string, SearchConfig> {
-  return table.prototype[SEARCH_CONFIGS] as Map<string, SearchConfig>;
+  let configMap = table.prototype[SEARCH_CONFIGS] as Map<string, SearchConfig>;
+  if (configMap === undefined) {
+    configMap = new Map<string, SearchConfig>();
+  }
+  return configMap;
 }
 
 export function getTableConfig(table: Class): TableConfig {
@@ -41,22 +49,24 @@ export function getTableConfig(table: Class): TableConfig {
   return config;
 }
 
-export class Crud {
+// Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
+abstract class Crud {
   // API 的 base uri，例如 /v1/your_repo_name
   private readonly apiBaseUri: string;
-  // 字段配置列表
+  // 数据类元数据
+  private readonly tableConfig: TableConfig;
+  // 字段元数据列表
   private readonly fieldConfigs: Map<string, FieldConfig>;
   // 查询配置列表
   private readonly searchConfigs: Map<string, SearchConfig>;
-  private readonly tableConfig: TableConfig;
 
   constructor(poClass: any) {
+    this.tableConfig = getTableConfig(poClass);
     this.fieldConfigs = getFieldConfigs(poClass);
     this.searchConfigs = getSearchConfigs(poClass);
-    this.tableConfig = getTableConfig(poClass);
+    // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
-    // console.log("tableConfig", this.tableConfig);
     this.apiBaseUri = this.tableConfig.apiBaseUrl;
   }
 
@@ -199,10 +209,28 @@ export class Crud {
       }
       conditions.push(`"pageRequest": ${JSON.stringify(pageRequest)}`);
     }
-    console.log('toRequest: ' + conditions.join(',\n'));
+    console.log(`request: {
+      ${conditions.join(',\n')}
+    }`);
     return `{
-    ${conditions.join(',\n')}
-  }`
+      ${conditions.join(',\n')}
+    }`
   }
+}
 
+// 可以用 new 创建实例的 Crud 类，仅仅是继承了 abstract 的 Crud
+class CrudImpl extends Crud { }
+
+// 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
+export class CrudApiFactory {
+  private static instanceMap: Map<Class, Crud> = new Map<Class, Crud>();
+  // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
+  public static get(clazz: Class): Crud {
+    let crud = CrudApiFactory.instanceMap.get(clazz)
+    if (crud === undefined) {
+      crud = new CrudImpl(clazz);
+      CrudApiFactory.instanceMap.set(clazz, crud);
+    }
+    return crud;
+  }
 }

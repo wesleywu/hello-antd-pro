@@ -3,7 +3,6 @@ import { BorderHorizontalOutlined, BorderVerticleOutlined, FileTextOutlined } fr
 import { ProSchemaValueEnumType } from "@ant-design/pro-provider";
 import { OperatorType, ProtoType, visible, WildcardType } from "@/utils/types";
 import { field, search, table } from "@/utils/decorators";
-import { Crud } from "@/utils/crud";
 import "reflect-metadata";
 
 // contentType 字段的显示转换速查表
@@ -103,6 +102,3 @@ export class VideoCollection {
   })
   updatedAt: Date;
 }
-
-// 后端 api
-export const videoCollectionApi = new Crud(VideoCollection);

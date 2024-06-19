@@ -1,7 +1,7 @@
-import { ControlType } from "@/components/FormField";
-
+// 定义 Class 类型，所谓 Class ，其实就是一个 function，是对应 class 的构造函数
 export type Class<T = any> = new (...args: any[]) => T;
 
+// 定义 Optional 类型，用于将 type | interface 里必须赋值的属性设置为可以不赋值，但不需要在属性后面加 ?
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export enum ProtoType {
@@ -74,6 +74,48 @@ export type ListRes<Item> = {
 export type TableConfig = {
   apiBaseUrl: string;
   description?: string;
+}
+
+export enum ControlType {
+  Text,
+  TextDigit,
+  TextPassword,
+  TextArea,
+  Select,
+  DateRangePicker,
+  DateTimeRangePicker,
+}
+
+export type FieldInfo = {
+  fieldName: string,
+  protoType: ProtoType,
+  displayType?: ControlType,
+  description: string,
+  required?: boolean,
+  displayValueMapping?: Map<any, any>;
+}
+
+export function defaultDisplayType(protoType: ProtoType, displayType?: ControlType): ControlType {
+  if (displayType !== undefined) {
+    return displayType;
+  }
+  switch (protoType) {
+    case ProtoType.DoubleValue:
+    case ProtoType.FloatValue:
+    case ProtoType.Int32Value:
+    case ProtoType.UInt32Value:
+    case ProtoType.Int64Value:
+    case ProtoType.UInt64Value:
+      return ControlType.TextDigit;
+    case ProtoType.StringValue:
+      return ControlType.Text;
+    case ProtoType.BoolValue:
+      return ControlType.Select;
+    case ProtoType.Date:
+      return ControlType.DateRangePicker;
+    case ProtoType.DateTime:
+      return ControlType.DateTimeRangePicker;
+  }
 }
 
 // 定义字段配置元数据的结构

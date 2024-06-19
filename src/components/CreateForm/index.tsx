@@ -5,19 +5,20 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, showInCreate } from "@/utils/types";
-import { defaultDisplayType, FormField } from "@/components/FormField";
-import { Crud, getFieldConfigs, getTableConfig } from "@/utils/crud";
+import { Class, FieldConfig, defaultDisplayType, showInCreate } from "@/utils/types";
+import { FormField } from "@/components/FormField";
+import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
 
 interface CreateFormProps<T> {
   poClass: Class<T>,
-  crudApi: Crud,
   onOk?: () => void;
 }
 
 export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: CreateFormProps<any> & DrawerFormProps) => {
   // 新增成功后触发的回调
-  const { poClass, crudApi, onOk } = props;
+  const { poClass, onOk } = props;
+  // crud api 实例
+  const crudApi = CrudApiFactory.get(poClass);
   // form 的数据
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示

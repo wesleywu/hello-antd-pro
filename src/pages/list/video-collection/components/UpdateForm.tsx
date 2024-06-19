@@ -3,7 +3,8 @@ import { useRequest } from '@umijs/max';
 import { message } from 'antd';
 import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { VideoCollection } from "../constants";
-import { contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
+import { contentTypeMap, filterTypeMap, isOnlineMap } from "../constants";
+import { CrudApiFactory } from "@/utils/crud";
 
 export type UpdateFormProps = {
   onOk?: () => void;
@@ -20,6 +21,8 @@ const UpdateForm: FC<UpdateFormProps> = (props) => {
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
+  // crud api
+  const videoCollectionApi = CrudApiFactory.get(VideoCollection);
 
   const { run } = useRequest(videoCollectionApi.update, {
     manual: true,
