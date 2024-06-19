@@ -33,12 +33,13 @@ export function getFieldConfigs(table: any): Map<string, FieldConfig> {
 }
 
 export function getSearchConfigs(table: any): Map<string, SearchConfig> {
-  const configs = table.prototype[SEARCH_CONFIGS] as SearchConfig[];
-  const result = new Map<string, SearchConfig>();
-  configs.forEach(value => {
-    result.set(value.fieldName, value);
-  })
-  return result
+  return table.prototype[SEARCH_CONFIGS] as Map<string, SearchConfig>;
+  // const configs = table.prototype[SEARCH_CONFIGS] as SearchConfig[];
+  // const result = new Map<string, SearchConfig>();
+  // configs.forEach(value => {
+  //   result.set(value.fieldName, value);
+  // })
+  // return result
 }
 
 export class Crud {
@@ -153,13 +154,13 @@ export class Crud {
       }
       let searchConfig = this.searchConfigs.get(fieldName);
       if (searchConfig === undefined) {
-        searchConfig = newSearchConfig(fieldName);
+        searchConfig = newSearchConfig();
       }
       const fieldValue = req[fieldName];
       if (fieldValue === undefined) {
         continue;
       }
-      const condition = toCondition(fieldConfig, searchConfig,  fieldValue);
+      const condition = toCondition(fieldName, fieldValue, fieldConfig, searchConfig);
       if (condition !== undefined && condition.trim().length === 0) {
         continue;
       }

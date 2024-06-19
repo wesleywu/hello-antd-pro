@@ -10,16 +10,17 @@ import { FieldConfig, MultiType, OperatorType, ProtoType } from "@/utils/types"
 import { newSearchConfig } from "@/utils/decorators"
 import dayjs from "dayjs";
 
+const fieldName = "demoField";
+
 describe("testing conditionNumberValue with various number value", () => {
   test("single double value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.DoubleValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -32,13 +33,12 @@ describe("testing conditionNumberValue with various number value", () => {
   });
   test("single float value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.FloatValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -51,13 +51,12 @@ describe("testing conditionNumberValue with various number value", () => {
   });
   test("single int64 value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.Int64Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -70,13 +69,12 @@ describe("testing conditionNumberValue with various number value", () => {
   });
   test("single uint64 value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt64Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -89,13 +87,12 @@ describe("testing conditionNumberValue with various number value", () => {
   });
   test("single int32 value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.Int32Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -108,13 +105,12 @@ describe("testing conditionNumberValue with various number value", () => {
   });
   test("single uint32 value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: number = 0.0;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -130,13 +126,12 @@ describe("testing conditionNumberValue with various number value", () => {
 describe("testing conditionNumberBoolValue with boolean value", () => {
   test("1 bool value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: boolean = true;
-    const result = conditionNumberBoolValue(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -152,13 +147,12 @@ describe("testing conditionNumberBoolValue with boolean value", () => {
 describe("testing conditionStringValue", () => {
   test("single string value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: string = "test_string";
-    const result = conditionStringValue(fieldConfig, searchConfig, value);
+    const result = conditionStringValue(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -174,13 +168,12 @@ describe("testing conditionStringValue", () => {
 describe("testing conditionNumberBoolSlice with uint32 values", () => {
   test("1 uint32 with type UInt32Value value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<number> = [1];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -193,13 +186,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("2 uint32 with type UInt32Value value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<number> = [1, 2];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -212,13 +204,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("3 uint32 with type UInt32Value value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<number> = [1, 2, 3];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -231,13 +222,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("3 uint32 with type UInt32Value value and multi NotIn", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.NotIn);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.NotIn);
     const value: Array<number> = [1,2,3];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "NotIn",
@@ -250,13 +240,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("1 uint32 with type UInt32Value value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<number> = [1];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -269,13 +258,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("2 uint32 with type UInt32Value value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<number> = [1,2];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "Between",
@@ -288,13 +276,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
   });
   test("3 uint32 with type UInt32Value value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.UInt32Value,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<number> = [1,2,3];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = ''
     // should log en error
     expect(result).toBe(expectedResult);
@@ -304,13 +291,12 @@ describe("testing conditionNumberBoolSlice with uint32 values", () => {
 describe("testing conditionNumberBoolSlice with boolean values", () => {
   test("1 boolean with type BoolValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<boolean> = [true];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -323,13 +309,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("2 boolean with type BoolValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<boolean> = [true, false];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -342,13 +327,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("3 boolean with type BoolValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<boolean> = [true, false, true];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -361,13 +345,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("3 boolean with type BoolValue value and multi NotIn", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.NotIn);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.NotIn);
     const value: Array<boolean> = [true, false, true];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "NotIn",
@@ -380,13 +363,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("1 boolean with type BoolValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<boolean> = [true];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -399,13 +381,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("2 boolean with type BoolValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<boolean> = [true, false];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "Between",
@@ -418,13 +399,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
   });
   test("3 boolean with type BoolValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.BoolValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<boolean> = [true, false, true];
-    const result = conditionNumberBoolSlice(fieldConfig, searchConfig, value);
+    const result = conditionNumberBoolSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = ''
     // should log en error
     expect(result).toBe(expectedResult);
@@ -434,13 +414,12 @@ describe("testing conditionNumberBoolSlice with boolean values", () => {
 describe("testing conditionStringSlice", () => {
   test("1 boolean with type StringValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<string> = ["key1"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -453,13 +432,12 @@ describe("testing conditionStringSlice", () => {
   });
   test("2 boolean with type StringValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<string> = ["key1","key2"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -472,13 +450,12 @@ describe("testing conditionStringSlice", () => {
   });
   test("3 boolean with type StringValue value", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField");
+    const searchConfig = newSearchConfig();
     const value: Array<string> = ["key1","key2","key3"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "In",
@@ -491,13 +468,12 @@ describe("testing conditionStringSlice", () => {
   });
   test("3 boolean with type StringValue value and multi NotIn", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.NotIn);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.NotIn);
     const value: Array<string> = ["key1","key2","key3"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "NotIn",
@@ -510,13 +486,13 @@ describe("testing conditionStringSlice", () => {
   });
   test("1 boolean with type StringValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
+
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<string> = ["key1"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
@@ -529,13 +505,13 @@ describe("testing conditionStringSlice", () => {
   });
   test("2 boolean with type StringValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
+
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<string> = ["key1","key2"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "multi": "Between",
@@ -548,13 +524,13 @@ describe("testing conditionStringSlice", () => {
   });
   test("3 boolean with type StringValue value and multi Between", () => {
     const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
+
       dbColumnName: "",
       columnType: ProtoType.StringValue,
     };
-    const searchConfig = newSearchConfig("demoField", OperatorType.EQ, MultiType.Between);
+    const searchConfig = newSearchConfig(OperatorType.EQ, MultiType.Between);
     const value: Array<string> = ["key1","key2","key3"];
-    const result = conditionStringSlice(fieldConfig, searchConfig, value);
+    const result = conditionStringSlice(fieldName, value, fieldConfig, searchConfig);
     const expectedResult = ''
     // should log en error
     expect(result).toBe(expectedResult);
@@ -563,86 +539,44 @@ describe("testing conditionStringSlice", () => {
 
 describe("testing conditionDateBetween", () => {
   test("1 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("2 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, undefined];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("3 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, undefined, undefined];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("2 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), dayjs('undefined')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 undefined and 1 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), undefined];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 invalid date and 1 valid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), dayjs('2024-02-16 12:23:34')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     // 北京时间 2024-02-16 当日的最后一毫秒为 2024-02-16T15:59:59.999Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -655,14 +589,8 @@ describe("testing conditionDateBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 undefined and 1 valid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, dayjs('2024-02-16 12:23:34')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     // 北京时间 2024-02-16 当日的最后一毫秒为 2024-02-16T15:59:59.999Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -675,14 +603,8 @@ describe("testing conditionDateBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 valid date and 1 invalid value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), dayjs('invalid-date')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -695,14 +617,8 @@ describe("testing conditionDateBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 valid date and 1 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), undefined];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -715,14 +631,8 @@ describe("testing conditionDateBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("2 valid date", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.Date,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), dayjs('2024-02-16 12:23:34')];
-    const result = conditionDateBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     // 北京时间 2024-02-16 当日的最后一毫秒为 2024-02-16T15:59:59.999Z
     const expectedResult = `"demoField": {
@@ -739,86 +649,44 @@ describe("testing conditionDateBetween", () => {
 
 describe("testing conditionDateTimeBetween", () => {
   test("1 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("2 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, undefined];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("3 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, undefined, undefined];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("2 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), dayjs('undefined')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 undefined and 1 invalid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), undefined];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = ``
     expect(result).toBe(expectedResult);
   });
   test("1 invalid date and 1 valid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('invalid-date'), dayjs('2024-02-16 12:23:34')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
       "operator": "LTE",
@@ -830,14 +698,8 @@ describe("testing conditionDateTimeBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 undefined and 1 valid date value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [undefined, dayjs('2024-02-16 12:23:34')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     // 北京时间 2024-02-16 当日的最后一毫秒为 2024-02-16T15:59:59.999Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -850,14 +712,8 @@ describe("testing conditionDateTimeBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 valid date and 1 invalid value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), dayjs('invalid-date')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -870,14 +726,8 @@ describe("testing conditionDateTimeBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("1 valid date and 1 undefined value", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), undefined];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     const expectedResult = `"demoField": {
       "@type":"goguru.orm.Condition",
@@ -890,14 +740,8 @@ describe("testing conditionDateTimeBetween", () => {
     expect(result).toBe(expectedResult);
   });
   test("2 valid date", () => {
-    const fieldConfig : FieldConfig = {
-      fieldName: "demoField",
-      dbColumnName: "",
-      columnType: ProtoType.DateTime,
-    };
-    const searchConfig = newSearchConfig("demoField");
     const value: Array<dayjs.Dayjs | undefined> = [dayjs('2024-02-16 12:23:34'), dayjs('2024-02-16 13:23:34')];
-    const result = conditionDateTimeBetween(fieldConfig, searchConfig, value);
+    const result = conditionDateTimeBetween(fieldName, value);
     // 北京时间 2024-02-16 当日起始时间为 2024-02-15T16:00:00.000Z
     // 北京时间 2024-02-16 当日的最后一毫秒为 2024-02-16T15:59:59.999Z
     const expectedResult = `"demoField": {

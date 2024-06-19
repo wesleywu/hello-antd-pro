@@ -70,10 +70,10 @@ export type ListRes<Item> = {
 };
 
 // 定义字段配置元数据的结构
-export interface FieldProps {
-  dbColumnName: string;
-  description: string;
+export interface FieldConfig {
   columnType: ProtoType;
+  dbColumnName?: string;
+  description?: string;
   required?: boolean;
   visibility?: Visibility;
   controlTypeInCreateForm?: ControlType;
@@ -82,17 +82,11 @@ export interface FieldProps {
   displayValueMapping?: Map<any, any>;
 }
 
-export interface FieldConfig extends FieldProps {
-  fieldName: string;
-}
-
-
 // 定义搜索配置元数据的结构
 export interface SearchConfig {
-  fieldName: string;
-  operator: OperatorType;
-  multi: MultiType;
-  wildcard: WildcardType;
+  operator?: OperatorType;
+  multi?: MultiType;
+  wildcard?: WildcardType;
 }
 
 export type Visibility = number;

@@ -33,8 +33,8 @@ const multiProtoTypeMapping = new Map<ProtoType, string>([
   [ProtoType.DateTime, 'goguru.types.TimestampSlice'],
 ]);
 
-export function conditionNumberBoolValue<T>(fieldConfig: FieldConfig, searchConfig: SearchConfig, fieldValue: T): string {
-  return `"${fieldConfig.fieldName}": {
+export function conditionNumberBoolValue<T>(fieldName: string, fieldValue: T, fieldConfig: FieldConfig, searchConfig: SearchConfig): string {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "${searchConfig.operator}",
       "value":{
@@ -44,8 +44,8 @@ export function conditionNumberBoolValue<T>(fieldConfig: FieldConfig, searchConf
     }`
 }
 
-export function conditionStringValue(fieldConfig: FieldConfig, searchConfig: SearchConfig, fieldValue: string): string {
-  return `"${fieldConfig.fieldName}": {
+export function conditionStringValue(fieldName: string, fieldValue: string, fieldConfig: FieldConfig, searchConfig: SearchConfig): string {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "${searchConfig.operator}",
       "value":{
@@ -55,12 +55,12 @@ export function conditionStringValue(fieldConfig: FieldConfig, searchConfig: Sea
     }`
 }
 
-export function conditionNumberBoolSlice<T>(fieldConfig: FieldConfig, searchConfig: SearchConfig, fieldValue: Array<T>): string {
+export function conditionNumberBoolSlice<T>(fieldName: string, fieldValue: Array<T>, fieldConfig: FieldConfig, searchConfig: SearchConfig): string {
   if (fieldValue.length === 0) {
     return '';
   }
   if (fieldValue.length === 1) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "${OperatorType.EQ}",
       "value":{
@@ -74,7 +74,7 @@ export function conditionNumberBoolSlice<T>(fieldConfig: FieldConfig, searchConf
     multiType = MultiType.In;
   }
   if (multiType === MultiType.In || multiType === MultiType.NotIn) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "${multiType}",
       "value":{
@@ -85,10 +85,10 @@ export function conditionNumberBoolSlice<T>(fieldConfig: FieldConfig, searchConf
   }
   // now this.multiType should be MultiType.Between or MultiType.NotBetween
   if (fieldValue.length !== 2) {
-    console.error(`element count of ${fieldConfig.fieldName} property array should be exactly 2 for MultiType ${multiType}`);
+    console.error(`element count of ${fieldName} property array should be exactly 2 for MultiType ${multiType}`);
     return '';
   }
-  return `"${fieldConfig.fieldName}": {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "${multiType}",
       "value":{
@@ -98,12 +98,12 @@ export function conditionNumberBoolSlice<T>(fieldConfig: FieldConfig, searchConf
     }`;
 }
 
-export function conditionStringSlice(fieldConfig: FieldConfig, searchConfig: SearchConfig, fieldValue: Array<string>): string {
+export function conditionStringSlice(fieldName: string, fieldValue: Array<string>, fieldConfig: FieldConfig, searchConfig: SearchConfig): string {
   if (fieldValue.length === 0) {
     return '';
   }
   if (fieldValue.length === 1) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "EQ",
       "value":{
@@ -117,7 +117,7 @@ export function conditionStringSlice(fieldConfig: FieldConfig, searchConfig: Sea
     multiType = MultiType.In;
   }
   if (multiType === MultiType.In || multiType === MultiType.NotIn) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "${multiType}",
       "value":{
@@ -128,10 +128,10 @@ export function conditionStringSlice(fieldConfig: FieldConfig, searchConfig: Sea
   }
   // now this.multiType should be MultiType.Between or MultiType.NotBetween
   if (fieldValue.length !== 2) {
-    console.error(`element count of ${fieldConfig.fieldName} property array should be exactly 2 for MultiType ${multiType}`);
+    console.error(`element count of ${fieldName} property array should be exactly 2 for MultiType ${multiType}`);
     return '';
   }
-  return `"${fieldConfig.fieldName}": {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "${multiType}",
       "value":{
@@ -141,12 +141,12 @@ export function conditionStringSlice(fieldConfig: FieldConfig, searchConfig: Sea
     }`;
 }
 
-export function conditionDateBetween(fieldConfig: FieldConfig, searchConfig: SearchConfig, dateArray: Array<dayjs.Dayjs | undefined>): string {
+export function conditionDateBetween(fieldName: string, dateArray: Array<dayjs.Dayjs | undefined>): string {
   if (dateArray.length === 0) {
     return '';
   }
   if (dateArray.length !== 2) {
-    console.error(`element count of ${fieldConfig.fieldName} field value array should be exactly 2 for date between condition`);
+    console.error(`element count of ${fieldName} field value array should be exactly 2 for date between condition`);
     return '';
   }
   const dateStart = dateArray[0] === undefined || !dateArray[0]?.isValid() ? undefined : dateArray[0].set('h', 0).set('m', 0).set('s', 0).set('ms', 0).tz('Asia/Shanghai').toISOString();
@@ -155,7 +155,7 @@ export function conditionDateBetween(fieldConfig: FieldConfig, searchConfig: Sea
     return '';
   }
   if (dateEnd === undefined) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "GTE",
       "value":{
@@ -165,7 +165,7 @@ export function conditionDateBetween(fieldConfig: FieldConfig, searchConfig: Sea
     }`;
   }
   if (dateStart === undefined) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "LTE",
       "value":{
@@ -174,7 +174,7 @@ export function conditionDateBetween(fieldConfig: FieldConfig, searchConfig: Sea
       }
     }`;
   }
-  return `"${fieldConfig.fieldName}": {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "Between",
       "value":{
@@ -184,12 +184,12 @@ export function conditionDateBetween(fieldConfig: FieldConfig, searchConfig: Sea
     }`;
 }
 
-export function conditionDateTimeBetween(fieldConfig: FieldConfig, searchConfig: SearchConfig, dateArray: Array<dayjs.Dayjs | undefined>): string {
+export function conditionDateTimeBetween(fieldName: string, dateArray: Array<dayjs.Dayjs | undefined>): string {
   if (dateArray.length === 0) {
     return '';
   }
   if (dateArray.length !== 2) {
-    console.error(`element count of ${fieldConfig.fieldName} field value array should be exactly 2 for datetime between condition`);
+    console.error(`element count of ${fieldName} field value array should be exactly 2 for datetime between condition`);
     return '';
   }
   const dateStart = dateArray[0] === undefined || !dateArray[0]?.isValid() ? undefined : dateArray[0].tz('Asia/Shanghai').toISOString();
@@ -198,7 +198,7 @@ export function conditionDateTimeBetween(fieldConfig: FieldConfig, searchConfig:
     return '';
   }
   if (dateEnd === undefined) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "GTE",
       "value":{
@@ -208,7 +208,7 @@ export function conditionDateTimeBetween(fieldConfig: FieldConfig, searchConfig:
     }`;
   }
   if (dateStart === undefined) {
-    return `"${fieldConfig.fieldName}": {
+    return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "operator": "LTE",
       "value":{
@@ -217,7 +217,7 @@ export function conditionDateTimeBetween(fieldConfig: FieldConfig, searchConfig:
       }
     }`;
   }
-  return `"${fieldConfig.fieldName}": {
+  return `"${fieldName}": {
       "@type":"goguru.orm.Condition",
       "multi": "Between",
       "value":{
@@ -246,52 +246,51 @@ function isArrayAndElementType(fieldName: string, fieldValue: any, destElementTy
   return true
 }
 
-export function toCondition(fieldConfig: FieldConfig, searchConfig: SearchConfig, fieldValue: any): string {
-  const fieldName = fieldConfig.fieldName
+export function toCondition(fieldName: string, fieldValue: any, fieldConfig: FieldConfig, searchConfig: SearchConfig): string {
   if (fieldConfig.columnType === ProtoType.DoubleValue || fieldConfig.columnType === ProtoType.FloatValue || fieldConfig.columnType === ProtoType.Int64Value || fieldConfig.columnType === ProtoType.UInt64Value || fieldConfig.columnType === ProtoType.Int32Value || fieldConfig.columnType === ProtoType.UInt32Value) {
     if (typeof fieldValue === 'number') {
-      return conditionNumberBoolValue(fieldConfig, searchConfig, fieldValue as number);
+      return conditionNumberBoolValue(fieldName, fieldValue as number, fieldConfig, searchConfig);
     } else if (isArrayAndElementType(fieldName, fieldValue , "number", false)) {
-      return conditionNumberBoolSlice(fieldConfig, searchConfig, fieldValue as Array<number>);
+      return conditionNumberBoolSlice(fieldName, fieldValue as Array<number>, fieldConfig, searchConfig);
     } else {
       console.error(`type of ${fieldName} field should be string or Array<number>`)
       return '';
     }
   } else if (fieldConfig.columnType === ProtoType.BoolValue) {
     if (typeof fieldValue === 'boolean') {
-      return conditionNumberBoolValue(fieldConfig, searchConfig, fieldValue as boolean);
+      return conditionNumberBoolValue(fieldName, fieldValue as boolean, fieldConfig, searchConfig);
     } else if (isArrayAndElementType(fieldName, fieldValue , "boolean", false)) {
-      return conditionNumberBoolSlice(fieldConfig, searchConfig, fieldValue as Array<boolean>);
+      return conditionNumberBoolSlice(fieldName, fieldValue as Array<boolean>, fieldConfig, searchConfig);
     } else {
       console.error(`type of ${fieldName} field should be string or Array<boolean>`)
       return '';
     }
   } else if (fieldConfig.columnType === ProtoType.StringValue) {
     if (typeof fieldValue === 'string') {
-      return conditionStringValue(fieldConfig, searchConfig, fieldValue as string);
+      return conditionStringValue(fieldName, fieldValue as string, fieldConfig, searchConfig);
     } else if (isArrayAndElementType(fieldName, fieldValue , "string", false)) {
-      return conditionStringSlice(fieldConfig, searchConfig, fieldValue as Array<string>);
+      return conditionStringSlice(fieldName, fieldValue as Array<string>, fieldConfig, searchConfig);
     } else {
       console.error(`type of ${fieldName} field should be string or Array<string>`)
       return '';
     }
   } else if (fieldConfig.columnType === ProtoType.Date) {
-    if (isArrayAndElementType(fieldConfig.fieldName, fieldValue, "string")) {
+    if (isArrayAndElementType(fieldName, fieldValue, "string")) {
       const dateArray = fieldValue.map((value: string | undefined) => {
         if (value === undefined) return undefined;
         return dayjs(value);
       });
-      return conditionDateBetween(fieldConfig, searchConfig, dateArray as Array<dayjs.Dayjs | undefined>);
+      return conditionDateBetween(fieldName, dateArray as Array<dayjs.Dayjs | undefined>);
     } else {
       return '';
     }
   } else if (fieldConfig.columnType === ProtoType.DateTime) {
-    if (isArrayAndElementType(fieldConfig.fieldName, fieldValue, "string")) {
+    if (isArrayAndElementType(fieldName, fieldValue, "string")) {
       const dateArray = fieldValue.map((value: string | undefined) => {
         if (value === undefined) return undefined;
         return dayjs(value);
       });
-      return conditionDateTimeBetween(fieldConfig, searchConfig, dateArray as Array<dayjs.Dayjs | undefined>);
+      return conditionDateTimeBetween(fieldName, dateArray as Array<dayjs.Dayjs | undefined>);
     } else {
       return '';
     }

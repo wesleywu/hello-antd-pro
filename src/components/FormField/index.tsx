@@ -63,7 +63,11 @@ export const FormField: FC<FieldItemProps> = (props: FieldItemProps) => {
       message: newProps.description + "必须输入",
     }];
   }
-  newProps.label = newProps.description;
+  if (newProps.description) {
+    newProps.label = newProps.description;
+  } else {
+    newProps.label = newProps.fieldName;
+  }
   newProps.width = "lg";
   if (newProps.displayValueMapping) {
     newProps.valueEnum = newProps.displayValueMapping;
