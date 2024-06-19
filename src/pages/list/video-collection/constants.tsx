@@ -2,7 +2,7 @@ import React from "react";
 import { BorderHorizontalOutlined, BorderVerticleOutlined, FileTextOutlined } from "@ant-design/icons";
 import { ProSchemaValueEnumType } from "@ant-design/pro-provider";
 import { OperatorType, ProtoType, visible, WildcardType } from "@/utils/types";
-import { field, search } from "@/utils/decorators";
+import { field, search, table } from "@/utils/decorators";
 import { Crud } from "@/utils/crud";
 import "reflect-metadata";
 
@@ -31,7 +31,11 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
   }],
 ]);
 
-// 表字段定义
+// 数据类定义
+@table({
+  description: "视频集",
+  apiBaseUrl: "/v1/video-collection",
+})
 export class VideoCollection {
   @field({
     description: "视频集编号",
@@ -101,4 +105,4 @@ export class VideoCollection {
 }
 
 // 后端 api
-export const videoCollectionApi = new Crud(VideoCollection, '/v1/video-collection');
+export const videoCollectionApi = new Crud(VideoCollection);

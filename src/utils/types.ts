@@ -71,12 +71,13 @@ export type ListRes<Item> = {
   pageInfo: PageInfo;
 };
 
-export interface TableConfig {
-  description?: string
+export type TableConfig = {
+  apiBaseUrl: string;
+  description?: string;
 }
 
 // 定义字段配置元数据的结构
-export interface FieldConfig {
+export type FieldConfig = {
   columnType: ProtoType;
   dbColumnName: string;
   description: string;
@@ -92,7 +93,7 @@ export interface FieldConfig {
 export type FieldConfigOptional = Optional<FieldConfig, keyof Pick<FieldConfig, 'dbColumnName' | 'description'>>
 
 // 定义搜索配置元数据的结构
-export interface SearchConfig {
+export type SearchConfig = {
   operator?: OperatorType;
   multi?: MultiType;
   wildcard?: WildcardType;

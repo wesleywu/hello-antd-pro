@@ -1,9 +1,9 @@
 import { request } from '@umijs/max';
 import type { SortOrder } from "antd/lib/table/interface";
-import { FieldConfig, ListRes, PageRequest, SearchConfig, Sort } from "@/utils/types";
+import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort, TableConfig } from "@/utils/types";
 import { AxiosResponse } from "axios";
 import { toCondition } from "@/utils/conditions";
-import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig } from "@/utils/decorators";
+import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig, TABLE_CONFIG } from "@/utils/decorators";
 
 // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
 function populateKeyWithId(response: AxiosResponse) {
@@ -22,24 +22,23 @@ function populateKeyWithId(response: AxiosResponse) {
   return response
 }
 
-export function getFieldConfigs(table: any): Map<string, FieldConfig> {
+export function getFieldConfigs(table: Class): Map<string, FieldConfig> {
   return table.prototype[FIELD_CONFIGS] as Map<string, FieldConfig>;
-  // const configs = table.prototype[FIELD_CONFIGS] as FieldConfig[];
-  // const result = new Map<string, FieldConfig>();
-  // configs.forEach(value => {
-  //   result.set(value.fieldName, value);
-  // })
-  // return result
 }
 
-export function getSearchConfigs(table: any): Map<string, SearchConfig> {
+export function getSearchConfigs(table: Class): Map<string, SearchConfig> {
   return table.prototype[SEARCH_CONFIGS] as Map<string, SearchConfig>;
-  // const configs = table.prototype[SEARCH_CONFIGS] as SearchConfig[];
-  // const result = new Map<string, SearchConfig>();
-  // configs.forEach(value => {
-  //   result.set(value.fieldName, value);
-  // })
-  // return result
+}
+
+export function getTableConfig(table: Class): TableConfig {
+  const config = table.prototype[TABLE_CONFIG] as TableConfig;
+  if (config === undefined) {
+    throw new Error("必须在持久化对象类(Persistent Object class)上使用 @table 装饰器定义元数据");
+  }
+  if (config.description === undefined) {
+    config.description = table.name;
+  }
+  return config;
 }
 
 export class Crud {
@@ -49,13 +48,16 @@ export class Crud {
   private readonly fieldConfigs: Map<string, FieldConfig>;
   // 查询配置列表
   private readonly searchConfigs: Map<string, SearchConfig>;
+  private readonly tableConfig: TableConfig;
 
-  constructor(poClass: any, apiBaseUri: string) {
-    this.apiBaseUri = apiBaseUri;
+  constructor(poClass: any) {
     this.fieldConfigs = getFieldConfigs(poClass);
     this.searchConfigs = getSearchConfigs(poClass);
+    this.tableConfig = getTableConfig(poClass);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
+    // console.log("tableConfig", this.tableConfig);
+    this.apiBaseUri = this.tableConfig.apiBaseUrl;
   }
 
   /** 获取记录列表 POST ${apiBaseUri}/list */

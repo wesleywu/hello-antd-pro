@@ -7,7 +7,7 @@ import { useRequest } from "@@/exports";
 
 import { Class, FieldConfig, showInCreate } from "@/utils/types";
 import { defaultDisplayType, FormField } from "@/components/FormField";
-import { Crud, getFieldConfigs } from "@/utils/crud";
+import { Crud, getFieldConfigs, getTableConfig } from "@/utils/crud";
 
 interface CreateFormProps<T> {
   poClass: Class<T>,
@@ -22,16 +22,18 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
+  // 表的元数据
+  const tableConfig = getTableConfig(props.poClass);
   // 执行 api create
   const { run } = useRequest(crudApi.create, {
     manual: true,
     onSuccess: async () => {
-      messageApi.success('新增视频集合成功');
+      messageApi.success('新增' + tableConfig.description + '成功');
       formRef.current?.resetFields();
       onOk?.();
     },
     onError: async () => {
-      messageApi.error('新增视频集合失败，请重试');
+      messageApi.error('新增' + tableConfig.description + '失败，请重试');
     },
   });
   // 渲染字段的 FormField
@@ -63,7 +65,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
     <>
       {contextHolder}
       <DrawerForm
-        title='新建视频集合'
+        title={'新建' + tableConfig.description}
         formRef={ formRef }
         trigger={
           <Button type="primary" icon={ <PlusOutlined/> }>新建</Button>
