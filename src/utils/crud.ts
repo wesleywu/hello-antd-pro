@@ -1,9 +1,9 @@
 import { request } from '@umijs/max';
 import type { SortOrder } from "antd/lib/table/interface";
-import { ListRes, PageRequest, Sort } from "@/utils/types";
+import { FieldConfig, ListRes, PageRequest, SearchConfig, Sort } from "@/utils/types";
 import { AxiosResponse } from "axios";
 import { toCondition } from "@/utils/conditions";
-import { FIELD_CONFIGS, FieldConfig, SEARCH_CONFIGS, SearchConfig, newSearchConfig } from "@/utils/decorators";
+import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig } from "@/utils/decorators";
 
 // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
 function populateKeyWithId(response: AxiosResponse) {
@@ -22,16 +22,17 @@ function populateKeyWithId(response: AxiosResponse) {
   return response
 }
 
-function fieldConfigs(table: any): Map<string, FieldConfig> {
-  const configs = table.prototype[FIELD_CONFIGS] as FieldConfig[];
-  const result = new Map<string, FieldConfig>();
-  configs.forEach(value => {
-    result.set(value.fieldName, value);
-  })
-  return result
+export function getFieldConfigs(table: any): Map<string, FieldConfig> {
+  return table.prototype[FIELD_CONFIGS] as Map<string, FieldConfig>;
+  // const configs = table.prototype[FIELD_CONFIGS] as FieldConfig[];
+  // const result = new Map<string, FieldConfig>();
+  // configs.forEach(value => {
+  //   result.set(value.fieldName, value);
+  // })
+  // return result
 }
 
-function searchConfigs(table: any): Map<string, SearchConfig> {
+export function getSearchConfigs(table: any): Map<string, SearchConfig> {
   const configs = table.prototype[SEARCH_CONFIGS] as SearchConfig[];
   const result = new Map<string, SearchConfig>();
   configs.forEach(value => {
@@ -50,8 +51,8 @@ export class Crud {
 
   constructor(poClass: any, apiBaseUri: string) {
     this.apiBaseUri = apiBaseUri;
-    this.fieldConfigs = fieldConfigs(poClass);
-    this.searchConfigs = searchConfigs(poClass);
+    this.fieldConfigs = getFieldConfigs(poClass);
+    this.searchConfigs = getSearchConfigs(poClass);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
   }

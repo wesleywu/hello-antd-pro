@@ -5,8 +5,8 @@ import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pr
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "./constants";
-import CreateForm from './components/CreateForm';
 import UpdateForm from './components/UpdateForm';
+import { CreateForm } from "@/components/CreateForm";
 
 const VideoCollectionListPage: React.FC = () => {
   // 刷新表格的actionRef
@@ -182,7 +182,7 @@ const VideoCollectionListPage: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [<CreateForm key="create" onOk={() => {
+        toolBarRender={() => [<CreateForm key="create" poClass={VideoCollection} crudApi={videoCollectionApi} onOk={() => {
           actionRef.current?.reload();
         }} />]}
         request={videoCollectionApi.list<VideoCollection>}

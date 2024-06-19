@@ -1,9 +1,11 @@
 import { FC, useRef } from 'react';
 import { Button, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-components';
-import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap, videoCollectionApi } from "../constants";
+import { DrawerForm, ProFormDigit, ProFormInstance, ProFormSelect } from '@ant-design/pro-components';
+import { contentTypeMap, filterTypeMap, isOnlineMap, VideoCollection, videoCollectionApi } from "../constants";
 import { useRequest } from "@umijs/max";
+import { ControlType, FormField } from "@/components/FormField";
+import { ProtoType } from "@/utils/types";
 
 interface CreateFormProps {
   onOk?: () => void;
@@ -51,63 +53,40 @@ const CreateForm: FC<CreateFormProps> = (props) => {
           return true;
         }}
       >
-        <ProFormText
-          label='集合名称'
-          rules={[
-            {
-              required: true,
-              message: ('集合名称必须输入'),
-            },
-          ]}
-          width="lg"
-          name="name"
+        <FormField
+          fieldName={'name'}
+          protoType={ProtoType.StringValue}
+          required={true}
+          description={'集合名称'}
         />
-        <ProFormSelect
-          label='内容体裁'
-          rules={[
-            {
-              required: true,
-              message: ('内容体裁必须输入'),
-            },
-          ]}
-          width="lg"
-          name="contentType"
-          valueEnum={contentTypeMap}
+        <FormField
+          fieldName={'contentType'}
+          protoType={ProtoType.StringValue}
+          displayType={ControlType.Select}
+          required={true}
+          description={'内容体裁'}
+          displayValueMapping={contentTypeMap}
         />
-        <ProFormSelect
-          label='筛选方式'
-          rules={[
-            {
-              required: true,
-              message: ('筛选方式必须输入'),
-            },
-          ]}
-          width="lg"
-          name="filterType"
-          valueEnum={filterTypeMap}
+        <FormField
+          fieldName={'filterType'}
+          protoType={ProtoType.StringValue}
+          displayType={ControlType.Select}
+          required={true}
+          description={'筛选方式'}
+          displayValueMapping={filterTypeMap}
         />
-        <ProFormDigit
-          label='内容量'
-          rules={[
-            {
-              required: true,
-              message: ('内容量必须输入'),
-            },
-          ]}
-          width="lg"
-          name="count"
+        <FormField
+          fieldName={'count'}
+          protoType={ProtoType.Int32Value}
+          required={true}
+          description={'内容量'}
         />
-        <ProFormSelect
-          label='是否上线'
-          rules={[
-            {
-              required: true,
-              message: ('是否上线必须输入'),
-            },
-          ]}
-          width="lg"
-          name="isOnline"
-          valueEnum={isOnlineMap}
+        <FormField
+          fieldName={'isOnline'}
+          protoType={ProtoType.BoolValue}
+          required={true}
+          description={'是否上线'}
+          displayValueMapping={isOnlineMap}
         />
       </DrawerForm>
     </>
