@@ -5,7 +5,7 @@ import { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pr
 import { FooterToolbar, PageContainer, ProDescriptions, ProTable } from '@ant-design/pro-components';
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
-import UpdateForm from './components/UpdateForm';
+import { UpdateForm } from '@/components/UpdateForm';
 import { CreateForm } from "@/components/CreateForm";
 import { CrudApiFactory } from "@/utils/crud";
 
@@ -229,6 +229,7 @@ const VideoCollectionListPage: React.FC = () => {
       )}
       <UpdateForm
         key="修改"
+        poClass={VideoCollection}
         visible={showUpdateForm}
         onOk={() => {
           actionRef.current?.reload();

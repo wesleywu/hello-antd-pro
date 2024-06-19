@@ -5,18 +5,23 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, defaultDisplayType, showInCreate } from "@/utils/types";
+import { Class, FieldConfig, defaultDisplayType, showInUpdate } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
+import { VideoCollection } from "@/pages/list/video-collection/constants";
 
-interface CreateFormProps<T> {
+interface UpdateFormProps<T> {
   poClass: Class<T>,
   onOk?: () => void;
+  onCancel?: () => void;
+  getValues?: () => Partial<T>;
+  visible: boolean;
+  idValue: string;
 }
 
-export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: CreateFormProps<any> & DrawerFormProps) => {
-  // 新增成功后触发的回调
-  const { poClass, onOk } = props;
+export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: UpdateFormProps<any> & DrawerFormProps) => {
+  // 修改成功、取消后触发的回调
+  const { poClass, onOk, onCancel, getValues, visible, idValue } = props;
   // form 的数据
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
@@ -25,16 +30,15 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const tableConfig = getTableConfig(props.poClass);
   // crud api 实例
   const crudApi = CrudApiFactory.get(poClass);
-  // 执行 api create
-  const { run } = useRequest(crudApi.create, {
+  // 执行 api update
+  const { run } = useRequest(crudApi.update, {
     manual: true,
     onSuccess: async () => {
-      messageApi.success('新增' + tableConfig.description + '成功');
-      formRef.current?.resetFields();
+      messageApi.success('修改' + tableConfig.description + '成功');
       onOk?.();
     },
     onError: async () => {
-      messageApi.error('新增' + tableConfig.description + '失败，请重试');
+      messageApi.error('修改' + tableConfig.description + '失败，请重试');
     },
   });
   // 渲染字段的 FormField
@@ -42,7 +46,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
     const controls: any[] = [];
     let createFieldsConfig = new Map<string, FieldConfig>;
     getFieldConfigs(poClass).forEach((value, key) => {
-      if (showInCreate(value.visibility)) {
+      if (showInUpdate(value.visibility)) {
         createFieldsConfig.set(key, value);
       }
     });
@@ -53,7 +57,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
           key={ fieldName }
           fieldName={ fieldName }
           protoType={ fieldConfig.columnType }
-          displayType={ defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
+          displayType={ defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInUpdateForm) }
           required={ fieldConfig.required }
           description={ fieldConfig.description }
           displayValueMapping={ fieldConfig.displayValueMapping }
@@ -66,17 +70,24 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
     <>
       {contextHolder}
       <DrawerForm
-        title={'新建' + tableConfig.description}
+        title={'修改' + tableConfig.description}
         formRef={ formRef }
         trigger={
           <Button type="primary" icon={ <PlusOutlined/> }>新建</Button>
         }
+        open={visible}
         width="500px"
-        // modalProps={{ okButtonProps: { loading } }}
-        onFinish={ async (value) => {
-          await run(value);
+        onOpenChange={(visible) => {
+          if (!visible) {
+            onCancel?.();
+          } else {
+            formRef?.current?.setFieldsValue(getValues?.());
+          }
+        }}
+        onFinish={async (value) => {
+          await run(idValue, value);
           return true;
-        } }
+        }}
       >
         {renderFields()}
       </DrawerForm>
