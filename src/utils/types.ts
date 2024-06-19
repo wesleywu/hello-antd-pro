@@ -2,6 +2,8 @@ import { ControlType } from "@/components/FormField";
 
 export type Class<T = any> = new (...args: any[]) => T;
 
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
 export enum ProtoType {
   DoubleValue,
   FloatValue,
@@ -69,11 +71,15 @@ export type ListRes<Item> = {
   pageInfo: PageInfo;
 };
 
+export interface TableConfig {
+  description?: string
+}
+
 // 定义字段配置元数据的结构
 export interface FieldConfig {
   columnType: ProtoType;
-  dbColumnName?: string;
-  description?: string;
+  dbColumnName: string;
+  description: string;
   required?: boolean;
   visibility?: Visibility;
   controlTypeInCreateForm?: ControlType;
@@ -81,6 +87,9 @@ export interface FieldConfig {
   controlTypeInSearchForm?: ControlType;
   displayValueMapping?: Map<any, any>;
 }
+
+// 允许如下字段在 FieldConfigOptional 中不指定
+export type FieldConfigOptional = Optional<FieldConfig, keyof Pick<FieldConfig, 'dbColumnName' | 'description'>>
 
 // 定义搜索配置元数据的结构
 export interface SearchConfig {

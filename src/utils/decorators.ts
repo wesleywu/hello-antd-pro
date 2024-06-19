@@ -1,4 +1,4 @@
-import { FieldConfig, MultiType, OperatorType, SearchConfig, WildcardType } from "@/utils/types";
+import { FieldConfig, FieldConfigOptional, MultiType, OperatorType, SearchConfig, WildcardType } from "@/utils/types";
 import { camelToSnakeCase } from "@/utils/strings";
 
 // 用于存储 字段配置元数据的 Symbol
@@ -7,7 +7,7 @@ export const FIELD_CONFIGS = Symbol("field_configs");
 export const SEARCH_CONFIGS = Symbol("search_configs")
 
 // 用于字段的装饰器(注解)，给定字段配置元数据信息
-export function field(config: FieldConfig) {
+export function field(config: FieldConfigOptional) {
   function createDecoratorFunction(table: any, fieldName: string) {
     if (config.dbColumnName === undefined) {
       if (fieldName.toLowerCase() === "id") {
@@ -15,6 +15,9 @@ export function field(config: FieldConfig) {
       } else {
         config.dbColumnName = camelToSnakeCase(fieldName);
       }
+    }
+    if (config.description === undefined) {
+      config.description = fieldName;
     }
     (table[FIELD_CONFIGS] || (table[FIELD_CONFIGS] = new Map<string, FieldConfig>)).set(fieldName, config);
     return config as any;

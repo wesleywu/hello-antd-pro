@@ -22,13 +22,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
-  // 字段配置
-  let fieldConfigs: FieldConfig[] = [];
-  getFieldConfigs(poClass).forEach(value => {
-    if (showInCreate(value.visibility)) {
-      fieldConfigs.push(value);
-    }
-  });
+  // 执行 api create
   const { run } = useRequest(crudApi.create, {
     manual: true,
     onSuccess: async () => {
@@ -40,6 +34,30 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
       messageApi.error('新增视频集合失败，请重试');
     },
   });
+  // 渲染字段的 FormField
+  const renderFields = () => {
+    const controls: any[] = [];
+    let createFieldsConfig = new Map<string, FieldConfig>;
+    getFieldConfigs(poClass).forEach((value, key) => {
+      if (showInCreate(value.visibility)) {
+        createFieldsConfig.set(key, value);
+      }
+    });
+    createFieldsConfig.forEach((fieldConfig, fieldName) => {
+      controls.push(
+        // todo 不需要再使用 FieldInfo，用 FieldConfig 替代即可
+        <FormField
+          key={ fieldName }
+          fieldName={ fieldName }
+          protoType={ fieldConfig.columnType }
+          displayType={ defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
+          required={ fieldConfig.required }
+          description={ fieldConfig.description }
+          displayValueMapping={ fieldConfig.displayValueMapping }
+        />);
+    });
+    return controls;
+  };
 
   return (
     <>
@@ -58,17 +76,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
           return true;
         } }
       >
-        {fieldConfigs.map((fieldConfig) => (
-          <FormField
-            key={fieldConfig.fieldName}
-            fieldName={fieldConfig.fieldName}
-            protoType={fieldConfig.columnType}
-            displayType={defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm)}
-            required={fieldConfig.required}
-            description={fieldConfig.description}
-            displayValueMapping={fieldConfig.displayValueMapping}
-          />
-        ))}
+        {renderFields()}
       </DrawerForm>
     </>
   );
