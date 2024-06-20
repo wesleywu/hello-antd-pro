@@ -10,21 +10,21 @@ import { FormField } from "@/components/FormField";
 import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
 
 interface CreateFormProps<T> {
-  poClass: Class<T>,
+  recordClass: Class<T>,
   onOk?: () => void;
 }
 
 export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: CreateFormProps<any> & DrawerFormProps) => {
   // 新增成功后触发的回调
-  const { poClass, onOk } = props;
+  const { recordClass, onOk } = props;
   // form 的数据
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
   // 表的元数据
-  const tableConfig = getTableConfig(props.poClass);
+  const tableConfig = getTableConfig(props.recordClass);
   // crud api 实例
-  const crudApi = CrudApiFactory.get(poClass);
+  const crudApi = CrudApiFactory.get(recordClass);
   // 执行 api create
   const { run } = useRequest(crudApi.create, {
     manual: true,
@@ -41,7 +41,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const renderFields = () => {
     const controls: any[] = [];
     let createFieldsConfig = new Map<string, FieldConfig>;
-    getFieldConfigs(poClass).forEach((value, key) => {
+    getFieldConfigs(recordClass).forEach((value, key) => {
       if (showInCreate(value.visibility)) {
         createFieldsConfig.set(key, value);
       }

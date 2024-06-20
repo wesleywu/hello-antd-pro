@@ -8,10 +8,9 @@ import { useRequest } from "@@/exports";
 import { Class, FieldConfig, getControlType, showInUpdate } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
-import { VideoCollection } from "@/pages/list/video-collection/constants";
 
 interface UpdateFormProps<T> {
-  poClass: Class<T>,
+  recordClass: Class<T>,
   onOk?: () => void;
   onCancel?: () => void;
   getValues?: () => Partial<T>;
@@ -21,15 +20,15 @@ interface UpdateFormProps<T> {
 
 export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: UpdateFormProps<any> & DrawerFormProps) => {
   // 修改成功、取消后触发的回调
-  const { poClass, onOk, onCancel, getValues, visible, idValue } = props;
+  const { recordClass, onOk, onCancel, getValues, visible, idValue } = props;
   // form 的数据
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
   // 表的元数据
-  const tableConfig = getTableConfig(props.poClass);
+  const tableConfig = getTableConfig(props.recordClass);
   // crud api 实例
-  const crudApi = CrudApiFactory.get(poClass);
+  const crudApi = CrudApiFactory.get(recordClass);
   // 执行 api update
   const { run } = useRequest(crudApi.update, {
     manual: true,
@@ -45,7 +44,7 @@ export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: Up
   const renderFields = () => {
     const controls: any[] = [];
     let createFieldsConfig = new Map<string, FieldConfig>;
-    getFieldConfigs(poClass).forEach((value, key) => {
+    getFieldConfigs(recordClass).forEach((value, key) => {
       if (showInUpdate(value.visibility)) {
         createFieldsConfig.set(key, value);
       }
@@ -72,9 +71,6 @@ export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: Up
       <DrawerForm
         title={'修改' + tableConfig.description}
         formRef={ formRef }
-        trigger={
-          <Button type="primary" icon={ <PlusOutlined/> }>新建</Button>
-        }
         open={visible}
         width="500px"
         onOpenChange={(visible) => {

@@ -4,8 +4,6 @@ import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort, TableConf
 import { AxiosResponse } from "axios";
 import { toCondition } from "@/utils/conditions";
 import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig, TABLE_CONFIG } from "@/utils/decorators";
-import { getColumnProps } from "@/utils/columns";
-import { ProColumns } from "@ant-design/pro-components";
 
 // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
 function populateKeyWithId(response: AxiosResponse) {
@@ -51,29 +49,25 @@ export function getTableConfig(table: Class): TableConfig {
   return config;
 }
 
-abstract class Metadata {
+export abstract class Metadata {
   // 数据类元数据
-  private readonly tableConfig: TableConfig;
+  private readonly _tableConfig: TableConfig;
   // 字段元数据列表
-  private readonly fieldConfigs: Map<string, FieldConfig>;
+  private readonly _fieldConfigs: Map<string, FieldConfig>;
   // 查询配置列表
-  private readonly searchConfigs: Map<string, SearchConfig>;
+  private readonly _searchConfigs: Map<string, SearchConfig>;
 
-  constructor(poClass: any) {
-    this.tableConfig = getTableConfig(poClass);
-    this.fieldConfigs = getFieldConfigs(poClass);
-    this.searchConfigs = getSearchConfigs(poClass);
+  constructor(recordClass: any) {
+    this._tableConfig = getTableConfig(recordClass);
+    this._fieldConfigs = getFieldConfigs(recordClass);
+    this._searchConfigs = getSearchConfigs(recordClass);
     // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
   }
-  columns = (): ProColumns[] => {
-    const columns: ProColumns[] = [];
-    this.fieldConfigs.forEach((fieldConfig, fieldName) => {
-      columns.push(getColumnProps(fieldName, fieldConfig));
-    });
-    return columns;
-  }
+  fieldConfigs = () => this._fieldConfigs;
+  searchConfigs = () => this._searchConfigs;
+  tableConfig = () => this._tableConfig;
 }
 
 // 可以用 new 创建实例的 Metadata 类，仅仅是继承了 abstract 的 Metadata
@@ -93,7 +87,6 @@ export class MetadataFactory {
   }
 }
 
-
 // Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
 abstract class Crud<T> {
   // API 的 base uri，例如 /v1/your_repo_name
@@ -105,10 +98,10 @@ abstract class Crud<T> {
   // 查询配置列表
   private readonly searchConfigs: Map<string, SearchConfig>;
 
-  constructor(poClass: Class<T>) {
-    this.tableConfig = getTableConfig(poClass);
-    this.fieldConfigs = getFieldConfigs(poClass);
-    this.searchConfigs = getSearchConfigs(poClass);
+  constructor(recordClass: Class<T>) {
+    this.tableConfig = getTableConfig(recordClass);
+    this.fieldConfigs = getFieldConfigs(recordClass);
+    this.searchConfigs = getSearchConfigs(recordClass);
     // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);

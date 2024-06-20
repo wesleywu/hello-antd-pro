@@ -75,6 +75,8 @@ export type ListRes<Item> = {
 
 export type TableConfig = {
   apiBaseUrl: string;
+  allowModify: boolean;
+  allowDelete: boolean;
   description?: string;
 }
 
@@ -164,12 +166,29 @@ export type SearchConfig = {
 
 export type Visibility = number;
 export enum visible {
-  create = 1,
-  update = 2,
-  search = 4,
+  none = 1,
+  list = 2,
+  detail = 4,
+  create = 8,
+  update = 16,
+  search = 32,
 }
 
 export const visibleAll: visible = visible.create | visible.update | visible.search
+
+export function showInList(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.list) === visible.list;
+}
+
+export function showInDetail(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.detail) === visible.detail;
+}
 
 export function showInCreate(visibility?: Visibility): boolean {
   if (visibility === undefined) {

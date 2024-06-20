@@ -33,14 +33,16 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
 // 数据类定义
 @table({
   description: "视频集",
+  allowModify: true,
+  allowDelete: true,
   apiBaseUrl: "/v1/video-collection",
 })
-export class VideoCollection {
+export class VideoCollection implements Record<string, any> {
   @field({
     description: "视频集编号",
     columnType: ProtoType.StringValue,
     required: true,
-    visibility: visible.search,
+    visibility: visible.none,
   })
   id: string;
 
@@ -74,7 +76,7 @@ export class VideoCollection {
   @field({
     description: "内容量",
     columnType: ProtoType.Int32Value,
-    visibility: visible.create | visible.update,
+    visibility: visible.list | visible.detail | visible.create | visible.update,
     required: true,
   })
   count: number;
@@ -91,7 +93,7 @@ export class VideoCollection {
     description: "创建时间",
     columnType: ProtoType.Date,
     required: true,
-    visibility: visible.search,
+    visibility: visible.list | visible.detail | visible.search,
   })
   createdAt: Date;
 
@@ -99,7 +101,7 @@ export class VideoCollection {
     description: "更新时间",
     columnType: ProtoType.Date,
     required: true,
-    visibility: visible.search,
+    visibility: visible.list | visible.detail,
   })
   updatedAt: Date;
 }
