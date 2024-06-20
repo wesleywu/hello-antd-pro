@@ -1,13 +1,13 @@
 import { FC, useRef } from "react";
 import { DrawerFormProps } from "@ant-design/pro-form/es/layouts/DrawerForm";
 import { DrawerForm, ProFormInstance } from "@ant-design/pro-components";
-import { Button, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { message } from "antd";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, getControlType, showInUpdate } from "@/utils/types";
+import { Class, getControlType } from "@/utils/types";
 import { FormField } from "@/components/FormField";
-import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
+import { CrudApiFactory } from "@/utils/crud";
+import { MetadataFactory } from "@/utils/metadata";
 
 interface UpdateFormProps<T> {
   recordClass: Class<T>,
@@ -25,8 +25,12 @@ export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: Up
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
-  // 表的元数据
-  const tableConfig = getTableConfig(props.recordClass);
+  // 所有元数据
+  const metadata = MetadataFactory.get(recordClass);
+  // 数据类元数据
+  const tableConfig = metadata.tableConfig();
+  // 在新增表单中显示的属性元数据
+  const fieldConfigs = metadata.fieldConfigsForUpdate();
   // crud api 实例
   const crudApi = CrudApiFactory.get(recordClass);
   // 执行 api update
@@ -43,20 +47,13 @@ export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: Up
   // 渲染字段的 FormField
   const renderFields = () => {
     const controls: any[] = [];
-    let createFieldsConfig = new Map<string, FieldConfig>;
-    getFieldConfigs(recordClass).forEach((value, key) => {
-      if (showInUpdate(value.visibility)) {
-        createFieldsConfig.set(key, value);
-      }
-    });
-    createFieldsConfig.forEach((fieldConfig, fieldName) => {
+    fieldConfigs.forEach((fieldConfig, fieldName) => {
       controls.push(
-        // todo 不需要再使用 FieldInfo，用 FieldConfig 替代即可
         <FormField
           key={ fieldName }
           fieldName={ fieldName }
-          protoType={ fieldConfig.columnType }
-          displayType={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInUpdateForm) }
+          columnType={ fieldConfig.columnType }
+          controlTypeInCreateForm={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInUpdateForm) }
           required={ fieldConfig.required }
           description={ fieldConfig.description }
           displayValueMapping={ fieldConfig.displayValueMapping }

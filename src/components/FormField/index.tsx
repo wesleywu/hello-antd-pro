@@ -7,10 +7,12 @@ import {
   ProFormText,
   ProFormTextArea
 } from "@ant-design/pro-form";
-import { ControlType, getControlType, FieldInfo } from "@/utils/types";
+import { ControlType, getControlType, FieldConfigOptional } from "@/utils/types";
 import { ProFormDateTimeRangePicker } from "@ant-design/pro-form";
 
-type FieldItemProps = FieldInfo & ProFormFieldItemProps & ProFormFieldRemoteProps
+type FieldItemProps = FieldConfigOptional & ProFormFieldItemProps & ProFormFieldRemoteProps & {
+  fieldName: string,
+}
 
 export const FormField: FC<FieldItemProps> = (props: FieldItemProps) => {
   const newProps = {...props}
@@ -30,7 +32,7 @@ export const FormField: FC<FieldItemProps> = (props: FieldItemProps) => {
   if (newProps.displayValueMapping) {
     newProps.valueEnum = newProps.displayValueMapping;
   }
-  const controlType: ControlType = getControlType(newProps.protoType,  newProps.displayType);
+  const controlType: ControlType = getControlType(newProps.columnType,  newProps.controlTypeInCreateForm);
   switch (controlType) {
     case ControlType.Text:
       return (<ProFormText {...newProps}

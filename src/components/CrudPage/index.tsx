@@ -1,4 +1,4 @@
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, ReactNode, useCallback, useRef, useState } from "react";
 import {
   ActionType,
   FooterToolbar,
@@ -7,24 +7,27 @@ import {
   ProDescriptionsItemProps,
   ProTable
 } from "@ant-design/pro-components";
-import { Button, Drawer, message, Popconfirm } from "antd";
-import { CrudApiFactory, MetadataFactory } from "@/utils/crud";
+import { Button, Drawer, message, Popconfirm, Space } from "antd";
+import { CrudApiFactory } from "@/utils/crud";
 import { useRequest } from "@@/exports";
 import { getColumns } from "@/utils/columns";
 import { CreateForm } from "@/components/CreateForm";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { UpdateForm } from "@/components/UpdateForm";
 import { Class } from "@/utils/types";
+import { MetadataFactory } from "@/utils/metadata";
 
 interface CrudPageProps<T extends Record<string, any>> {
   // 表格记录对应的数据类
   recordClass: Class<T>,
   // 每页显示的记录数
   pageSize: number,
+  // 附加的 footer
+  extraFooter?: (selectedRows: T[]) => ReactNode,
 }
 
 export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,>(props: CrudPageProps<T>) => {
-  const { recordClass, pageSize } = props;
+  const { recordClass, pageSize, extraFooter } = props;
   // 刷新表格的actionRef
   const actionRef = useRef<ActionType>();
   // 显示更新表单抽屉的开关
@@ -37,10 +40,10 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
-  // crud api
-  const api = CrudApiFactory.get(recordClass);
   // 数据类元数据
   const tableConfig = MetadataFactory.get(recordClass).tableConfig();
+  // crud api
+  const api = CrudApiFactory.get(recordClass);
   // 删除单一记录的请求
   const { run: deleteSingleRow } = useRequest(api.delete, {
     manual: true,
@@ -128,15 +131,10 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
       {selectedRows?.length > 0 && (
         <FooterToolbar
           extra={
-            <div>
-              {'已选择 '}<a style={{ fontWeight: 600 }}>{selectedRows.length}</a>{' 项'}
-              &nbsp;&nbsp;
-              <span>
-                {'内容总量 '}
-                {selectedRows.reduce((pre, item) => pre + item.count!, 0)}
-                {' 万'}
-              </span>
-            </div>
+            <Space size="small">
+              {'已选择'}<a style={{ fontWeight: 600 }}>{selectedRows.length}</a>{'项'}
+              { extraFooter ? extraFooter(selectedRows) : ''}
+            </Space>
           }
         >
           <Popconfirm

@@ -90,15 +90,6 @@ export enum ControlType {
   DateTimeRangePicker,
 }
 
-export type FieldInfo = {
-  fieldName: string,
-  protoType: ProtoType,
-  displayType?: ControlType,
-  description: string,
-  required?: boolean,
-  displayValueMapping?: Map<any, any>;
-}
-
 export function getControlType(protoType: ProtoType, controlType?: ControlType): ControlType {
   if (controlType !== undefined) {
     return controlType;
@@ -174,39 +165,4 @@ export enum visible {
   search = 32,
 }
 
-export const visibleAll: visible = visible.create | visible.update | visible.search
-
-export function showInList(visibility?: Visibility): boolean {
-  if (visibility === undefined) {
-    return true;
-  }
-  return (visibility & visible.list) === visible.list;
-}
-
-export function showInDetail(visibility?: Visibility): boolean {
-  if (visibility === undefined) {
-    return true;
-  }
-  return (visibility & visible.detail) === visible.detail;
-}
-
-export function showInCreate(visibility?: Visibility): boolean {
-  if (visibility === undefined) {
-    return true;
-  }
-  return (visibility & visible.create) === visible.create;
-}
-
-export function showInUpdate(visibility?: Visibility): boolean {
-  if (visibility === undefined) {
-    return true;
-  }
-  return (visibility & visible.update) === visible.update;
-}
-
-export function showInSearch(visibility?: Visibility): boolean {
-  if (visibility === undefined) {
-    return true;
-  }
-  return (visibility & visible.search) === visible.search;
-}
+export const visibleAll: visible = visible.list | visible.detail | visible.create | visible.update | visible.search

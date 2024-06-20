@@ -1,16 +1,37 @@
+import { ProColumns } from "@ant-design/pro-components";
+import { DatePicker, Popconfirm, Space } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { JSX } from "react/jsx-runtime";
+
+import { MetadataFactory } from "@/utils/metadata";
 import {
+  Class, Visibility, visible,
   getControlType,
   FieldConfig,
   getControlTypeString,
   ControlType,
-  showInSearch,
-  showInList, showInDetail, Class
 } from "@/utils/types";
-import { ProColumns } from "@ant-design/pro-components";
-import { DatePicker, Popconfirm, Space } from "antd";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import { MetadataFactory } from "@/utils/crud";
-import { JSX } from "react/jsx-runtime";
+
+export function showInList(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.list) === visible.list;
+}
+
+export function showInDetail(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.detail) === visible.detail;
+}
+
+export function showInSearch(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.search) === visible.search;
+}
 
 function getColumnProps(fieldName: string, fieldConfig: FieldConfig): ProColumns {
   const searchControlType = getControlType(fieldConfig.columnType, fieldConfig.controlTypeInSearchForm);

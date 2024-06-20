@@ -1,111 +1,41 @@
 import { request } from '@umijs/max';
 import type { SortOrder } from "antd/lib/table/interface";
-import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort, TableConfig } from "@/utils/types";
-import { AxiosResponse } from "axios";
+import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort } from "@/utils/types";
 import { toCondition } from "@/utils/conditions";
-import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig, TABLE_CONFIG } from "@/utils/decorators";
+import { newSearchConfig } from "@/utils/decorators";
+import { MetadataFactory } from "@/utils/metadata";
 
-// Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
-function populateKeyWithId(response: AxiosResponse) {
-  const { data } = response;
-  if (data && data.items) {
-    response.data.items = data.items.map((item: any) => {
-      if (item.id) {
-        return ({
-          key: item.id,
-          ...item,
-        })
-      }
-      return item;
-    });
-  }
-  return response
-}
-
-export function getFieldConfigs(table: Class): Map<string, FieldConfig> {
-  const configMap = table.prototype[FIELD_CONFIGS] as Map<string, FieldConfig>;
-  if (configMap === undefined) {
-    throw new Error(`没有数据类 ${table.name} 的属性上使用 @field 装饰器定义元数据`);
-  }
-  return configMap;
-}
-
-export function getSearchConfigs(table: Class): Map<string, SearchConfig> {
-  let configMap = table.prototype[SEARCH_CONFIGS] as Map<string, SearchConfig>;
-  if (configMap === undefined) {
-    configMap = new Map<string, SearchConfig>();
-  }
-  return configMap;
-}
-
-export function getTableConfig(table: Class): TableConfig {
-  const config = table.prototype[TABLE_CONFIG] as TableConfig;
-  if (config === undefined) {
-    throw new Error("必须在持久化对象类(Persistent Object class)上使用 @table 装饰器定义元数据");
-  }
-  if (config.description === undefined) {
-    config.description = table.name;
-  }
-  return config;
-}
-
-export abstract class Metadata {
-  // 数据类元数据
-  private readonly _tableConfig: TableConfig;
-  // 字段元数据列表
-  private readonly _fieldConfigs: Map<string, FieldConfig>;
-  // 查询配置列表
-  private readonly _searchConfigs: Map<string, SearchConfig>;
-
-  constructor(recordClass: any) {
-    this._tableConfig = getTableConfig(recordClass);
-    this._fieldConfigs = getFieldConfigs(recordClass);
-    this._searchConfigs = getSearchConfigs(recordClass);
-    // console.log("tableConfig", this.tableConfig);
-    // console.log("fieldConfigs", this.fieldConfigs);
-    // console.log("searchConfigs", this.searchConfigs);
-  }
-  fieldConfigs = () => this._fieldConfigs;
-  searchConfigs = () => this._searchConfigs;
-  tableConfig = () => this._tableConfig;
-}
-
-// 可以用 new 创建实例的 Metadata 类，仅仅是继承了 abstract 的 Metadata
-class MetadataImpl extends Metadata {}
-
-// 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
-export class MetadataFactory {
-  private static instanceMap: Map<Class, Metadata> = new Map<Class, Metadata>();
-  // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
-  public static get = <T> (clazz: Class<T>): Metadata => {
-    let metadata = MetadataFactory.instanceMap.get(clazz)
-    if (metadata === undefined) {
-      metadata = new MetadataImpl(clazz);
-      MetadataFactory.instanceMap.set(clazz, metadata);
-    }
-    return metadata;
-  }
-}
+// // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
+// function populateKeyWithId(response: AxiosResponse) {
+//   const { data } = response;
+//   if (data && data.items) {
+//     response.data.items = data.items.map((item: any) => {
+//       if (item.id) {
+//         return ({
+//           key: item.id,
+//           ...item,
+//         })
+//       }
+//       return item;
+//     });
+//   }
+//   return response
+// }
 
 // Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
-abstract class Crud<T> {
+abstract class CrudApi<T> {
   // API 的 base uri，例如 /v1/your_repo_name
   private readonly apiBaseUri: string;
-  // 数据类元数据
-  private readonly tableConfig: TableConfig;
   // 字段元数据列表
   private readonly fieldConfigs: Map<string, FieldConfig>;
   // 查询配置列表
   private readonly searchConfigs: Map<string, SearchConfig>;
 
   constructor(recordClass: Class<T>) {
-    this.tableConfig = getTableConfig(recordClass);
-    this.fieldConfigs = getFieldConfigs(recordClass);
-    this.searchConfigs = getSearchConfigs(recordClass);
-    // console.log("tableConfig", this.tableConfig);
-    // console.log("fieldConfigs", this.fieldConfigs);
-    // console.log("searchConfigs", this.searchConfigs);
-    this.apiBaseUri = this.tableConfig.apiBaseUrl;
+    const metadata = MetadataFactory.get(recordClass);
+    this.fieldConfigs = metadata.fieldConfigs();
+    this.searchConfigs = metadata.searchConfigs();
+    this.apiBaseUri = metadata.tableConfig().apiBaseUrl;
   }
 
   /** 获取记录列表 POST ${apiBaseUri}/list */
@@ -128,7 +58,7 @@ abstract class Crud<T> {
         'X-Requested-With': 'XMLHttpRequest'
       },
       data: data,
-      responseInterceptors: [populateKeyWithId],
+      // responseInterceptors: [populateKeyWithId], // 不需要再使用这个拦截器了，因为 rowKey 已经设置为对象类的主键属性
     });
     return {
       data: resp.items,
@@ -257,16 +187,16 @@ abstract class Crud<T> {
 }
 
 // 可以用 new 创建实例的 Crud 类，仅仅是继承了 abstract 的 Crud
-class CrudImpl<T> extends Crud<T> { }
+class CrudApiImpl<T> extends CrudApi<T> { }
 
 // 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
 export class CrudApiFactory {
-  private static instanceMap: Map<Class<any>, Crud<any>> = new Map<Class, Crud<any>>();
+  private static instanceMap: Map<Class<any>, CrudApi<any>> = new Map<Class, CrudApi<any>>();
   // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
-  public static get = <T> (clazz: Class<T>): Crud<T> => {
+  public static get = <T> (clazz: Class<T>): CrudApi<T> => {
     let crud = CrudApiFactory.instanceMap.get(clazz)
     if (crud === undefined) {
-      crud = new CrudImpl(clazz);
+      crud = new CrudApiImpl(clazz);
       CrudApiFactory.instanceMap.set(clazz, crud);
     }
     return crud;

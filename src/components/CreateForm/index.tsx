@@ -5,9 +5,10 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, getControlType, showInCreate } from "@/utils/types";
+import { Class, getControlType } from "@/utils/types";
 import { FormField } from "@/components/FormField";
-import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
+import { CrudApiFactory } from "@/utils/crud";
+import { MetadataFactory } from "@/utils/metadata";
 
 interface CreateFormProps<T> {
   recordClass: Class<T>,
@@ -21,8 +22,12 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const formRef = useRef<ProFormInstance>();
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
-  // 表的元数据
-  const tableConfig = getTableConfig(props.recordClass);
+  // 所有元数据
+  const metadata = MetadataFactory.get(recordClass);
+  // 数据类元数据
+  const tableConfig = metadata.tableConfig();
+  // 在新增表单中显示的属性元数据
+  const fieldConfigs = metadata.fieldConfigsForCreate();
   // crud api 实例
   const crudApi = CrudApiFactory.get(recordClass);
   // 执行 api create
@@ -40,20 +45,13 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   // 渲染字段的 FormField
   const renderFields = () => {
     const controls: any[] = [];
-    let createFieldsConfig = new Map<string, FieldConfig>;
-    getFieldConfigs(recordClass).forEach((value, key) => {
-      if (showInCreate(value.visibility)) {
-        createFieldsConfig.set(key, value);
-      }
-    });
-    createFieldsConfig.forEach((fieldConfig, fieldName) => {
+    fieldConfigs.forEach((fieldConfig, fieldName) => {
       controls.push(
-        // todo 不需要再使用 FieldInfo，用 FieldConfig 替代即可
         <FormField
           key={ fieldName }
           fieldName={ fieldName }
-          protoType={ fieldConfig.columnType }
-          displayType={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
+          columnType={ fieldConfig.columnType }
+          controlTypeInCreateForm={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
           required={ fieldConfig.required }
           description={ fieldConfig.description }
           displayValueMapping={ fieldConfig.displayValueMapping }
