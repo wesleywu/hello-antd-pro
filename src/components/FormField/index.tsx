@@ -7,8 +7,10 @@ import {
   ProFormText,
   ProFormTextArea
 } from "@ant-design/pro-form";
-import { ControlType, getControlType, FieldConfigOptional } from "@/utils/types";
+import { ControlType } from "@/utils/types";
 import { ProFormDateTimeRangePicker } from "@ant-design/pro-form";
+import { FieldConfigOptional } from "@/utils/decorators";
+import { getControlType } from "@/utils/controltype";
 
 type FieldItemProps = FieldConfigOptional & ProFormFieldItemProps & ProFormFieldRemoteProps & {
   fieldName: string,

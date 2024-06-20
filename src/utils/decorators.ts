@@ -1,19 +1,56 @@
-import {
-  TableConfig,
-  FieldConfig,
-  FieldConfigOptional,
-  MultiType,
-  OperatorType,
-  SearchConfig,
-  WildcardType
-} from "@/utils/types";
+import { ControlType, MultiType, OperatorType, Optional, ProtoType, Visibility, WildcardType } from "@/utils/types";
 import { camelToSnakeCase } from "@/utils/strings";
 
-// 用于存储 字段配置元数据的 Symbol
+// 用于存储 数据类元数据的 Symbol
+export const TABLE_CONFIG = Symbol("table_config")
+// 用于存储 数据类字段配置元数据的 Symbol
 export const FIELD_CONFIGS = Symbol("field_configs");
 // 用于存储 搜索配置元数据的 Symbol
 export const SEARCH_CONFIGS = Symbol("search_configs")
-export const TABLE_CONFIG = Symbol("table_config")
+
+// 定义数据类元数据的结构
+export type TableConfig = {
+  apiBaseUrl: string;
+  allowModify: boolean;
+  allowDelete: boolean;
+  description?: string;
+}
+
+// 定义数据类字段配置元数据的结构
+export type FieldConfig = {
+  columnType: ProtoType;
+  dbColumnName: string;
+  description: string;
+  required?: boolean;
+  visibility?: Visibility;
+  controlTypeInCreateForm?: ControlType;
+  controlTypeInUpdateForm?: ControlType;
+  controlTypeInSearchForm?: ControlType;
+  displayValueMapping?: Map<any, any>;
+}
+
+// 允许如下字段在 FieldConfigOptional 中不指定
+export type FieldConfigOptional = Optional<FieldConfig, keyof Pick<FieldConfig, 'dbColumnName' | 'description'>>
+
+// 定义搜索配置元数据的结构
+export type SearchConfig = {
+  operator?: OperatorType;
+  multi?: MultiType;
+  wildcard?: WildcardType;
+}
+
+// 用于po (persistent object) class 的装饰器(注解)，给定 CRUD 相关元数据
+export function table(config: TableConfig) {
+  function createDecoratorFunction(ctor: any) {
+    // 在类装饰器（class decorator）中, 第一个参数 ctor 是对应的类（class）的构造函数， ctor.prototype 才是类的定义
+    // console.log("table decorator: table.prototype", ctor.prototype);
+    if (!ctor.prototype[TABLE_CONFIG]) {
+      ctor.prototype[TABLE_CONFIG] = config;
+    }
+    return ctor;
+  }
+  return createDecoratorFunction;
+}
 
 // 用于字段的装饰器(注解)，给定字段配置元数据信息
 export function field(config: FieldConfigOptional) {
@@ -54,19 +91,6 @@ export function search(config: SearchConfig) {
     const searchConfig = newSearchConfig(config.operator, config.multi, config.wildcard);
     (table[SEARCH_CONFIGS] || (table[SEARCH_CONFIGS] = new Map<string, SearchConfig>)).set(fieldName, searchConfig);
     return searchConfig as any;
-  }
-  return createDecoratorFunction;
-}
-
-// 用于po (persistent object) class 的装饰器(注解)，给定 CRUD 相关元数据
-export function table(config: TableConfig) {
-  function createDecoratorFunction(ctor: any) {
-    // 在类装饰器（class decorator）中, 第一个参数 ctor 是对应的类（class）的构造函数， ctor.prototype 才是类的定义
-    // console.log("table decorator: table.prototype", ctor.prototype);
-    if (!ctor.prototype[TABLE_CONFIG]) {
-      ctor.prototype[TABLE_CONFIG] = config;
-    }
-    return ctor;
   }
   return createDecoratorFunction;
 }

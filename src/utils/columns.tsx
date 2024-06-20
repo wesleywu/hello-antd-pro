@@ -6,11 +6,10 @@ import { JSX } from "react/jsx-runtime";
 import { MetadataFactory } from "@/utils/metadata";
 import {
   Class, Visibility, visible,
-  getControlType,
-  FieldConfig,
-  getControlTypeString,
   ControlType,
 } from "@/utils/types";
+import { FieldConfig } from "@/utils/decorators";
+import { getControlType, getProFieldValueType } from "@/utils/controltype";
 
 export function showInList(visibility?: Visibility): boolean {
   if (visibility === undefined) {
@@ -38,7 +37,7 @@ function getColumnProps(fieldName: string, fieldConfig: FieldConfig): ProColumns
   const result: ProColumns = {
     title: fieldConfig.description,
     dataIndex: fieldName,
-    valueType: getControlTypeString(searchControlType),
+    valueType: getProFieldValueType(searchControlType),
     valueEnum: fieldConfig.displayValueMapping,
   }
   if (fieldConfig.displayValueMapping !== undefined) {

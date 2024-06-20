@@ -6,8 +6,8 @@ import {
   conditionStringSlice,
   conditionStringValue
 } from '@/utils/conditions';
-import { FieldConfig, MultiType, OperatorType, ProtoType } from "@/utils/types"
-import { newSearchConfig } from "@/utils/decorators"
+import { MultiType, OperatorType, ProtoType } from "@/utils/types"
+import { FieldConfig, newSearchConfig } from "@/utils/decorators"
 import dayjs from "dayjs";
 
 const fieldName = "demoField";

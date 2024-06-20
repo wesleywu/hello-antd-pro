@@ -5,10 +5,11 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, getControlType } from "@/utils/types";
+import { Class } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory } from "@/utils/crud";
 import { MetadataFactory } from "@/utils/metadata";
+import { getControlType } from "@/utils/controltype";
 
 interface CreateFormProps<T> {
   recordClass: Class<T>,

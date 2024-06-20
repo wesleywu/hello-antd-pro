@@ -1,5 +1,12 @@
-import { Class, FieldConfig, SearchConfig, TableConfig, Visibility, visible } from "@/utils/types";
-import { FIELD_CONFIGS, SEARCH_CONFIGS, TABLE_CONFIG } from "@/utils/decorators";
+import { Class, Visibility, visible } from "@/utils/types";
+import {
+  FIELD_CONFIGS,
+  FieldConfig,
+  SEARCH_CONFIGS,
+  SearchConfig,
+  TABLE_CONFIG,
+  TableConfig
+} from "@/utils/decorators";
 
 function getTableConfig(table: Class): TableConfig {
   const config = table.prototype[TABLE_CONFIG] as TableConfig;

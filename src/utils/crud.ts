@@ -1,8 +1,8 @@
 import { request } from '@umijs/max';
 import type { SortOrder } from "antd/lib/table/interface";
-import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort } from "@/utils/types";
+import { Class, ListRes, PageRequest, Sort } from "@/utils/types";
 import { toCondition } from "@/utils/conditions";
-import { newSearchConfig } from "@/utils/decorators";
+import { FieldConfig, newSearchConfig, SearchConfig } from "@/utils/decorators";
 import { MetadataFactory } from "@/utils/metadata";
 
 // // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段

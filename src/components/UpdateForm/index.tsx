@@ -4,10 +4,11 @@ import { DrawerForm, ProFormInstance } from "@ant-design/pro-components";
 import { message } from "antd";
 import { useRequest } from "@@/exports";
 
-import { Class, getControlType } from "@/utils/types";
+import { Class } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory } from "@/utils/crud";
 import { MetadataFactory } from "@/utils/metadata";
+import { getControlType } from "@/utils/controltype";
 
 interface UpdateFormProps<T> {
   recordClass: Class<T>,
