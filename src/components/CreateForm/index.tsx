@@ -5,7 +5,7 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, defaultDisplayType, showInCreate } from "@/utils/types";
+import { Class, FieldConfig, getControlType, showInCreate } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
 
@@ -53,7 +53,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
           key={ fieldName }
           fieldName={ fieldName }
           protoType={ fieldConfig.columnType }
-          displayType={ defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
+          displayType={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
           required={ fieldConfig.required }
           description={ fieldConfig.description }
           displayValueMapping={ fieldConfig.displayValueMapping }

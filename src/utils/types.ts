@@ -95,9 +95,9 @@ export type FieldInfo = {
   displayValueMapping?: Map<any, any>;
 }
 
-export function defaultDisplayType(protoType: ProtoType, displayType?: ControlType): ControlType {
-  if (displayType !== undefined) {
-    return displayType;
+export function getControlType(protoType: ProtoType, controlType?: ControlType): ControlType {
+  if (controlType !== undefined) {
+    return controlType;
   }
   switch (protoType) {
     case ProtoType.DoubleValue:
@@ -115,6 +115,25 @@ export function defaultDisplayType(protoType: ProtoType, displayType?: ControlTy
       return ControlType.DateRangePicker;
     case ProtoType.DateTime:
       return ControlType.DateTimeRangePicker;
+  }
+}
+
+export function getControlTypeString(controlType: ControlType): string {
+  switch (controlType) {
+    case ControlType.Text:
+      return "text";
+    case ControlType.TextDigit:
+      return "text";
+    case ControlType.TextPassword:
+      return "text";
+    case ControlType.Select:
+      return "select";
+    case ControlType.TextArea:
+      return "textarea";
+    case ControlType.DateRangePicker:
+      return "daterangepicker";
+    case ControlType.DateTimeRangePicker:
+      return "daterangepicker";
   }
 }
 

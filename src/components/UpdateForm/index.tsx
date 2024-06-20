@@ -5,7 +5,7 @@ import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class, FieldConfig, defaultDisplayType, showInUpdate } from "@/utils/types";
+import { Class, FieldConfig, getControlType, showInUpdate } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory, getFieldConfigs, getTableConfig } from "@/utils/crud";
 import { VideoCollection } from "@/pages/list/video-collection/constants";
@@ -57,7 +57,7 @@ export const UpdateForm: FC<UpdateFormProps<any> & DrawerFormProps> = (props: Up
           key={ fieldName }
           fieldName={ fieldName }
           protoType={ fieldConfig.columnType }
-          displayType={ defaultDisplayType(fieldConfig.columnType, fieldConfig.controlTypeInUpdateForm) }
+          displayType={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInUpdateForm) }
           required={ fieldConfig.required }
           description={ fieldConfig.description }
           displayValueMapping={ fieldConfig.displayValueMapping }
