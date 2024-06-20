@@ -74,6 +74,7 @@ export class VideoCollection {
   @field({
     description: "内容量",
     columnType: ProtoType.Int32Value,
+    visibility: visible.create | visible.update,
     required: true,
   })
   count: number;

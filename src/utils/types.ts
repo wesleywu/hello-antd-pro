@@ -1,4 +1,6 @@
 // 定义 Class 类型，所谓 Class ，其实就是一个 function，是对应 class 的构造函数
+import { ProFieldValueType } from "@ant-design/pro-utils/lib/typing";
+
 export type Class<T = any> = new (...args: any[]) => T;
 
 // 定义 Optional 类型，用于将 type | interface 里必须赋值的属性设置为可以不赋值，但不需要在属性后面加 ?
@@ -118,22 +120,22 @@ export function getControlType(protoType: ProtoType, controlType?: ControlType):
   }
 }
 
-export function getControlTypeString(controlType: ControlType): string {
+export function getControlTypeString(controlType: ControlType): ProFieldValueType {
   switch (controlType) {
     case ControlType.Text:
       return "text";
     case ControlType.TextDigit:
-      return "text";
+      return "digit";
     case ControlType.TextPassword:
-      return "text";
+      return "password";
     case ControlType.Select:
       return "select";
     case ControlType.TextArea:
       return "textarea";
     case ControlType.DateRangePicker:
-      return "daterangepicker";
+      return "dateTime";
     case ControlType.DateTimeRangePicker:
-      return "daterangepicker";
+      return "dateTime";
   }
 }
 

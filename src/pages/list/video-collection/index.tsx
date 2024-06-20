@@ -7,7 +7,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { VideoCollection, contentTypeMap, filterTypeMap, isOnlineMap } from "./constants";
 import { UpdateForm } from '@/components/UpdateForm';
 import { CreateForm } from "@/components/CreateForm";
-import { CrudApiFactory } from "@/utils/crud";
+import { CrudApiFactory, MetadataFactory } from "@/utils/crud";
 
 const VideoCollectionListPage: React.FC = () => {
   // 刷新表格的actionRef
@@ -68,7 +68,7 @@ const VideoCollectionListPage: React.FC = () => {
     },
     [deleteMultiRows],
   );
-
+  const columns1 = MetadataFactory.get(VideoCollection).columns();
   /**
    * 定义表格显示的列
    */
@@ -188,8 +188,8 @@ const VideoCollectionListPage: React.FC = () => {
         toolBarRender={() => [<CreateForm key="create" poClass={VideoCollection} onOk={() => {
           actionRef.current?.reload();
         }} />]}
-        request={videoCollectionApi.list<VideoCollection>}
-        columns={columns}
+        request={videoCollectionApi.list}
+        columns={columns1}
         pagination={{
           defaultPageSize: 5,
         }}

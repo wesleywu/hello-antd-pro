@@ -4,6 +4,8 @@ import { Class, FieldConfig, ListRes, PageRequest, SearchConfig, Sort, TableConf
 import { AxiosResponse } from "axios";
 import { toCondition } from "@/utils/conditions";
 import { FIELD_CONFIGS, SEARCH_CONFIGS, newSearchConfig, TABLE_CONFIG } from "@/utils/decorators";
+import { getColumnProps } from "@/utils/columns";
+import { ProColumns } from "@ant-design/pro-components";
 
 // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
 function populateKeyWithId(response: AxiosResponse) {
@@ -49,10 +51,7 @@ export function getTableConfig(table: Class): TableConfig {
   return config;
 }
 
-// Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
-abstract class Crud {
-  // API 的 base uri，例如 /v1/your_repo_name
-  private readonly apiBaseUri: string;
+abstract class Metadata {
   // 数据类元数据
   private readonly tableConfig: TableConfig;
   // 字段元数据列表
@@ -67,11 +66,57 @@ abstract class Crud {
     // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
+  }
+  columns = (): ProColumns[] => {
+    const columns: ProColumns[] = [];
+    this.fieldConfigs.forEach((fieldConfig, fieldName) => {
+      columns.push(getColumnProps(fieldName, fieldConfig));
+    });
+    return columns;
+  }
+}
+
+// 可以用 new 创建实例的 Metadata 类，仅仅是继承了 abstract 的 Metadata
+class MetadataImpl extends Metadata {}
+
+// 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
+export class MetadataFactory {
+  private static instanceMap: Map<Class, Metadata> = new Map<Class, Metadata>();
+  // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
+  public static get = <T> (clazz: Class<T>): Metadata => {
+    let metadata = MetadataFactory.instanceMap.get(clazz)
+    if (metadata === undefined) {
+      metadata = new MetadataImpl(clazz);
+      MetadataFactory.instanceMap.set(clazz, metadata);
+    }
+    return metadata;
+  }
+}
+
+
+// Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
+abstract class Crud<T> {
+  // API 的 base uri，例如 /v1/your_repo_name
+  private readonly apiBaseUri: string;
+  // 数据类元数据
+  private readonly tableConfig: TableConfig;
+  // 字段元数据列表
+  private readonly fieldConfigs: Map<string, FieldConfig>;
+  // 查询配置列表
+  private readonly searchConfigs: Map<string, SearchConfig>;
+
+  constructor(poClass: Class<T>) {
+    this.tableConfig = getTableConfig(poClass);
+    this.fieldConfigs = getFieldConfigs(poClass);
+    this.searchConfigs = getSearchConfigs(poClass);
+    // console.log("tableConfig", this.tableConfig);
+    // console.log("fieldConfigs", this.fieldConfigs);
+    // console.log("searchConfigs", this.searchConfigs);
     this.apiBaseUri = this.tableConfig.apiBaseUrl;
   }
 
   /** 获取记录列表 POST ${apiBaseUri}/list */
-  list = async <T>(
+  list = async (
     params: T & {
       pageSize?: number;
       current?: number;
@@ -219,13 +264,13 @@ abstract class Crud {
 }
 
 // 可以用 new 创建实例的 Crud 类，仅仅是继承了 abstract 的 Crud
-class CrudImpl extends Crud { }
+class CrudImpl<T> extends Crud<T> { }
 
 // 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
 export class CrudApiFactory {
-  private static instanceMap: Map<Class, Crud> = new Map<Class, Crud>();
+  private static instanceMap: Map<Class<any>, Crud<any>> = new Map<Class, Crud<any>>();
   // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
-  public static get(clazz: Class): Crud {
+  public static get = <T> (clazz: Class<T>): Crud<T> => {
     let crud = CrudApiFactory.instanceMap.get(clazz)
     if (crud === undefined) {
       crud = new CrudImpl(clazz);
