@@ -15,6 +15,10 @@ export enum ProtoType {
   StringValue,
   Date,
   DateTime,
+  SimpleArray,
+  SimpleMap,
+  ObjectArray,
+  ObjectMap,
 }
 
 export enum OperatorType {

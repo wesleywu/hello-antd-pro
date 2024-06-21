@@ -30,6 +30,32 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
   }],
 ]);
 
+export class QuestionAnswer implements Record<string, any> {
+  @field({
+    description: "开始时间",
+    columnType: ProtoType.StringValue,
+  })
+  startTime: string;
+
+  @field({
+    description: "结束时间",
+    columnType: ProtoType.StringValue,
+  })
+  endTime: string;
+
+  @field({
+    description: "问题",
+    columnType: ProtoType.StringValue,
+  })
+  question: string;
+
+  @field({
+    description: "回答",
+    columnType: ProtoType.StringValue,
+  })
+  answer: string;
+}
+
 // 数据类定义
 @table({
   description: "音频单集",
@@ -37,7 +63,7 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
   allowDelete: true,
   apiBaseUrl: "/v1/episode",
 })
-export class VideoCollection implements Record<string, any> {
+export class Episode implements Record<string, any> {
   @field({
     description: "音频编号",
     columnType: ProtoType.StringValue,
@@ -96,19 +122,19 @@ export class VideoCollection implements Record<string, any> {
 
   @field({
     description: "关键词",
-    columnType: ProtoType.StringValue,
+    columnType: ProtoType.SimpleArray,
   })
   keywords: string[];
 
   @field({
     description: "提纲",
-    columnType: ProtoType.StringValue,
+    columnType: ProtoType.SimpleMap,
   })
   outlines: Map<string, string>;
 
   @field({
     description: "提问&回答",
-    columnType: ProtoType.StringValue,
+    columnType: ProtoType.ObjectArray,
   })
   qas: string[];
 

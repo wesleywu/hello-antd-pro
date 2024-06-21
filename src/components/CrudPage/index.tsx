@@ -10,7 +10,7 @@ import {
 import { Button, Drawer, message, Popconfirm, Space } from "antd";
 import { CrudApiFactory } from "@/utils/crud";
 import { useRequest } from "@@/exports";
-import { getColumns } from "@/utils/columns";
+import { getDetailColumns, getTableColumns } from "@/utils/columns";
 import { CreateForm } from "@/components/CreateForm";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { UpdateForm } from "@/components/UpdateForm";
@@ -95,8 +95,10 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
   }, [showDetail]);
   // 处理点击删除按钮的逻辑
   const onDeleteClick = useCallback((record: T) => deleteSingleRow({id: record.id}), [deleteSingleRow])
-  // 定义表格、详情显示的列
-  const columns = getColumns(recordClass, onUpdateClick, onDeleteClick);
+  // 定义表格显示的列
+  const tableColumns = getTableColumns(recordClass, onUpdateClick, onDeleteClick);
+  // 定义详情显示的列
+  const detailColumns = getDetailColumns(recordClass);
 
   return (
     <PageContainer>
@@ -112,7 +114,7 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
           actionRef.current?.reload();
         }} />]}
         request={api.list}
-        columns={columns}
+        columns={tableColumns}
         pagination={{
           defaultPageSize: pageSize,
         }}
@@ -184,7 +186,7 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
             params={{
               id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<T>[]}
+            columns={detailColumns as ProDescriptionsItemProps<T>[]}
           />
         )}
       </Drawer>
