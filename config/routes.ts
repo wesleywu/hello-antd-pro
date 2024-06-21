@@ -140,10 +140,10 @@ export default [
         redirect: '/list/table-list',
       },
       {
-        name: 'video-collection',
+        name: 'episode',
         icon: 'smile',
-        path: '/list/video-collection',
-        component: './list/video-collection',
+        path: '/list/episode',
+        component: './list/episode',
       },
       {
         name: 'table-list',

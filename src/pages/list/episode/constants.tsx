@@ -7,15 +7,15 @@ import "reflect-metadata";
 
 // contentType 字段的显示转换速查表
 export const contentTypeMap: Map<string, React.ReactNode> = new Map([
-  ['TextImage', (<div key={1}><FileTextOutlined /> 图文</div>)],
-  ['LandscapeVideo', (<div key={2}><BorderHorizontalOutlined /> 竖版短视频</div>)],
-  ['PortraitVideo', (<div key={9}><BorderVerticleOutlined/> 横版短视频</div>)],
+  ['news', (<div key={1}><FileTextOutlined /> 新闻</div>)],
+  ['comedy', (<div key={2}><BorderHorizontalOutlined /> 喜剧</div>)],
+  ['sports', (<div key={9}><BorderVerticleOutlined/> 体育</div>)],
 ]);
 
 // filterType 字段的显示转换速查表
 export const filterTypeMap: Map<string, string> = new Map([
-  ['Ruled', '规则筛选'],
-  ['Manual', '人工'],
+  ['ruled', '规则筛选'],
+  ['manual', '人工'],
 ]);
 
 // isOnline 字段的显示转换速查表
@@ -32,14 +32,14 @@ export const isOnlineMap: Map<boolean, ProSchemaValueEnumType> = new Map([
 
 // 数据类定义
 @table({
-  description: "视频集",
+  description: "音频单集",
   allowModify: true,
   allowDelete: true,
-  apiBaseUrl: "/v1/video-collection",
+  apiBaseUrl: "/v1/episode",
 })
 export class VideoCollection implements Record<string, any> {
   @field({
-    description: "视频集编号",
+    description: "音频编号",
     columnType: ProtoType.StringValue,
     required: true,
     visibility: visible.none,
@@ -47,7 +47,7 @@ export class VideoCollection implements Record<string, any> {
   id: string;
 
   @field({
-    description: "视频集名称",
+    description: "音频名称",
     columnType: ProtoType.StringValue,
     required: true,
   })
@@ -58,7 +58,7 @@ export class VideoCollection implements Record<string, any> {
   name: string;
 
   @field({
-    description: "内容体裁",
+    description: "内容类型",
     columnType: ProtoType.StringValue,
     required: true,
     sortable: true,
@@ -77,7 +77,7 @@ export class VideoCollection implements Record<string, any> {
   filterType: string;
 
   @field({
-    description: "内容量",
+    description: "播放量",
     columnType: ProtoType.Int32Value,
     required: true,
     visibility: visible.list | visible.detail | visible.create | visible.update,
@@ -93,6 +93,24 @@ export class VideoCollection implements Record<string, any> {
     filterable: true,
   })
   isOnline: boolean;
+
+  @field({
+    description: "关键词",
+    columnType: ProtoType.StringValue,
+  })
+  keywords: string[];
+
+  @field({
+    description: "提纲",
+    columnType: ProtoType.StringValue,
+  })
+  outlines: Map<string, string>;
+
+  @field({
+    description: "提问&回答",
+    columnType: ProtoType.StringValue,
+  })
+  qas: string[];
 
   @field({
     description: "创建时间",
