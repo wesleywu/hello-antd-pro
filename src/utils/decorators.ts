@@ -1,5 +1,5 @@
-import { ControlType, MultiType, OperatorType, Optional, ProtoType, Visibility, WildcardType } from "@/utils/types";
-import { camelToSnakeCase } from "@/utils/strings";
+import { ControlType, MultiType, OperatorType, Optional, ProtoType, Visibility, WildcardType } from "./types";
+import { camelToSnakeCase } from "./strings";
 
 // 用于存储 数据类元数据的 Symbol
 export const TABLE_CONFIG = Symbol("table_config")

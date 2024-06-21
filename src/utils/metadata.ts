@@ -1,4 +1,4 @@
-import { Class, Visibility, visible } from "@/utils/types";
+import { Class, Visibility, visible } from "./types";
 import {
   FIELD_CONFIGS,
   FieldConfig,
@@ -6,7 +6,7 @@ import {
   SearchConfig,
   TABLE_CONFIG,
   TableConfig
-} from "@/utils/decorators";
+} from "./decorators";
 
 function getTableConfig(table: Class): TableConfig {
   const config = table.prototype[TABLE_CONFIG] as TableConfig;

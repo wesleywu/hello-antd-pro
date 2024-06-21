@@ -3,10 +3,10 @@ import { DatePicker, Popconfirm, Space } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { JSX } from "react/jsx-runtime";
 
-import { MetadataFactory, showInDetail, showInList, showInSearch } from "@/utils/metadata";
-import { Class, ControlType, } from "@/utils/types";
-import { FieldConfig } from "@/utils/decorators";
-import { getControlType, getProFieldValueType } from "@/utils/controltype";
+import { MetadataFactory, showInDetail, showInList, showInSearch } from "./metadata";
+import { Class, ControlType, } from "./types";
+import { FieldConfig } from "./decorators";
+import { getControlType, getProFieldValueType } from "./controltype";
 
 function getColumnProps(fieldName: string, fieldConfig: FieldConfig): ProColumns {
   const searchControlType = getControlType(fieldConfig.columnType, fieldConfig.controlTypeInSearchForm);

@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js"
 import { MultiType, OperatorType, ProtoType } from "./types";
-import { FieldConfig, SearchConfig } from "@/utils/decorators";
+import { FieldConfig, SearchConfig } from "./decorators";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

@@ -1,5 +1,5 @@
 import { ProFieldValueType } from "@ant-design/pro-utils/lib/typing";
-import { ControlType, ProtoType } from "@/utils/types";
+import { ControlType, ProtoType } from "./types";
 
 export function getControlType(protoType: ProtoType, controlType?: ControlType): ControlType {
   if (controlType !== undefined) {
