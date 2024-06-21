@@ -61,6 +61,7 @@ export class VideoCollection implements Record<string, any> {
     description: "内容体裁",
     columnType: ProtoType.StringValue,
     required: true,
+    sortable: true,
     displayValueMapping: contentTypeMap,
   })
   contentType: string;
@@ -69,15 +70,18 @@ export class VideoCollection implements Record<string, any> {
     description: "筛选方式",
     columnType: ProtoType.StringValue,
     required: true,
+    sortable: true,
     displayValueMapping: filterTypeMap,
+    filterable: true,
   })
   filterType: string;
 
   @field({
     description: "内容量",
     columnType: ProtoType.Int32Value,
-    visibility: visible.list | visible.detail | visible.create | visible.update,
     required: true,
+    visibility: visible.list | visible.detail | visible.create | visible.update,
+    sortable: true,
   })
   count: number;
 
@@ -86,6 +90,7 @@ export class VideoCollection implements Record<string, any> {
     columnType: ProtoType.BoolValue,
     required: true,
     displayValueMapping: isOnlineMap,
+    filterable: true,
   })
   isOnline: boolean;
 
@@ -94,6 +99,7 @@ export class VideoCollection implements Record<string, any> {
     columnType: ProtoType.Date,
     required: true,
     visibility: visible.list | visible.detail | visible.search,
+    sortable: true,
   })
   createdAt: Date;
 
@@ -102,6 +108,7 @@ export class VideoCollection implements Record<string, any> {
     columnType: ProtoType.Date,
     required: true,
     visibility: visible.list | visible.detail,
+    sortable: true,
   })
   updatedAt: Date;
 }

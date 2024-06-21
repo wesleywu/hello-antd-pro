@@ -1,4 +1,5 @@
-import { showInCreate, showInSearch, showInUpdate, visibleAll, visible } from "@/utils/types";
+import { visibleAll, visible } from "@/utils/types";
+import { showInCreate, showInSearch, showInUpdate } from "@/utils/metadata";
 
 describe("testing visibility", () => {
   test("create", () => {

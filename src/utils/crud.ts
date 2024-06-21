@@ -4,6 +4,7 @@ import { Class, ListRes, PageRequest, Sort } from "@/utils/types";
 import { toCondition } from "@/utils/conditions";
 import { FieldConfig, newSearchConfig, SearchConfig } from "@/utils/decorators";
 import { MetadataFactory } from "@/utils/metadata";
+import { deepMerge } from "@/utils/objects";
 
 // // Axios Response 的拦截器，针对返回的每一条记录，将 id 字段额外赋值给 key 字段
 // function populateKeyWithId(response: AxiosResponse) {
@@ -23,7 +24,7 @@ import { MetadataFactory } from "@/utils/metadata";
 // }
 
 // Crud API 的实际实现，为了避免让使用者直接 new Crud()，将其标记为 abstract
-abstract class CrudApi<T> {
+abstract class CrudApi<T extends Record<string, any>> {
   // API 的 base uri，例如 /v1/your_repo_name
   private readonly apiBaseUri: string;
   // 字段元数据列表
@@ -46,11 +47,12 @@ abstract class CrudApi<T> {
       keyword?: string;
     },
     sort: Record<string, SortOrder>,
-    // filter : Record<string, (string | number)[] | null>,
+    filter : Record<string, (string | number)[] | null>,
   ) => {
-    // todo 实现 filter
+    // 将 filter merge 到 search 条件中
+    const finalParams = deepMerge(params, filter);
     // 将 params, sort 等参数转换为服务端定义的 request 结构体
-    const data = this.toRequestBody(params, params.current ? params.current : 1, params.pageSize ? params.pageSize : 10, sort)
+    const data = this.toRequestBody(finalParams, params.current ? params.current : 1, params.pageSize ? params.pageSize : 10, sort)
     const resp = await request<ListRes<T>>(`${this.apiBaseUri}/list`, {
       method: 'POST',
       headers: {
@@ -137,7 +139,7 @@ abstract class CrudApi<T> {
         searchConfig = newSearchConfig();
       }
       const fieldValue = req[fieldName];
-      if (fieldValue === undefined) {
+      if (fieldValue === undefined || fieldValue === null) {
         continue;
       }
       const condition = toCondition(fieldName, fieldValue, fieldConfig, searchConfig);
@@ -187,16 +189,16 @@ abstract class CrudApi<T> {
 }
 
 // 可以用 new 创建实例的 Crud 类，仅仅是继承了 abstract 的 Crud
-class CrudApiImpl<T> extends CrudApi<T> { }
+class CrudApiImpl<T extends Record<string, any>> extends CrudApi<T> { }
 
 // 用于获得 Crud 类实例的工厂，只提供一个静态方法: get
 export class CrudApiFactory {
-  private static instanceMap: Map<Class<any>, CrudApi<any>> = new Map<Class, CrudApi<any>>();
+  private static instanceMap: Map<Class, CrudApi<any>> = new Map<Class, CrudApi<any>>();
   // 根据 class （类），返回其对应的 Crud API 实现，以同样的 class 参数多次调用不会重复创建实例
-  public static get = <T> (clazz: Class<T>): CrudApi<T> => {
+  public static get = <T extends Record<string, any>> (clazz: Class<T>): CrudApi<T> => {
     let crud = CrudApiFactory.instanceMap.get(clazz)
     if (crud === undefined) {
-      crud = new CrudApiImpl(clazz);
+      crud = new CrudApiImpl<T>(clazz);
       CrudApiFactory.instanceMap.set(clazz, crud);
     }
     return crud;

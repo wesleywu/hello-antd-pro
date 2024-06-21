@@ -35,14 +35,35 @@ function getSearchConfigs(table: Class): Map<string, SearchConfig> {
   return configMap;
 }
 
-function showInCreate(visibility?: Visibility): boolean {
+export function showInList(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.list) === visible.list;
+}
+
+export function showInDetail(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.detail) === visible.detail;
+}
+
+export function showInSearch(visibility?: Visibility): boolean {
+  if (visibility === undefined) {
+    return true;
+  }
+  return (visibility & visible.search) === visible.search;
+}
+
+export function showInCreate(visibility?: Visibility): boolean {
   if (visibility === undefined) {
     return true;
   }
   return (visibility & visible.create) === visible.create;
 }
 
-function showInUpdate(visibility?: Visibility): boolean {
+export function showInUpdate(visibility?: Visibility): boolean {
   if (visibility === undefined) {
     return true;
   }

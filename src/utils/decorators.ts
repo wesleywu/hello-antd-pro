@@ -23,6 +23,8 @@ export type FieldConfig = {
   description: string;
   required?: boolean;
   visibility?: Visibility;
+  sortable? : boolean;
+  filterable? : boolean;
   controlTypeInCreateForm?: ControlType;
   controlTypeInUpdateForm?: ControlType;
   controlTypeInSearchForm?: ControlType;
