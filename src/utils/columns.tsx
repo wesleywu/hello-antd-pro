@@ -8,6 +8,55 @@ import { Class, ControlType, ProtoType } from "./types";
 import { FieldConfig } from "./decorators";
 import { getControlType, getProFieldValueType } from "./controltype";
 
+export type ValueWrapper<T> = {
+  value: T;
+}
+
+/**
+ * transformObjectArrayToPlainArray 将 [{value: "1"}, {value: "2"}] 转换为 ["1", "2"]
+ * @param value
+ */
+function unwrapArray(value: ValueWrapper<any>[]): Record<string, any>[] {
+  return value.map((item) => item.value);
+}
+
+/**
+ * unwrapFieldsValue 将 [{value: "1"}, {value: "2"}] 转换为 ["1", "2"]
+ * @param value
+ * @param fieldsNeedUnwrapping
+ */
+export function unwrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedUnwrapping: Set<string>): T {
+  console.log("value before unwrapping", value);
+  const unwrappedValue: Record<string, any> = Object.assign({}, value);
+  for (const fieldName of Object.keys(value)) {
+    if (fieldsNeedUnwrapping.has(fieldName)) {
+      unwrappedValue[fieldName] = unwrapArray(value[fieldName])
+    }
+  }
+  console.log("value after unwrapping", unwrappedValue);
+  return unwrappedValue as T;
+}
+
+function wrapArray(value: any): ValueWrapper<any>[] {
+  if (Array.isArray(value)) {
+    return value.map((item) => ({ value: item }));
+  } else {
+    return [{ value }];
+  }
+}
+
+export function wrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedWrapping: Set<string>): Partial<T>  {
+  if (!value) {
+    return value;
+  }
+  const wrappedValue: Record<string, any> = Object.assign({}, value);
+  for (const fieldName of Object.keys(value)) {
+    if (fieldsNeedWrapping.has(fieldName)) {
+      wrappedValue[fieldName] = wrapArray(value[fieldName])
+    }
+  }
+  return wrappedValue as T;
+}
 
 const renderSimpleArray = (fieldName: string) => ( entity: Record<string, any>) => {
   const fieldValue = entity[fieldName] as Array<any>;
@@ -215,7 +264,7 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
         </Collapse>)
       }}
   } else if (fieldConfig.columnType === ProtoType.ObjectMap) {
-    result.render = ( _: any, entity: Record<string, any>) => {
+    result.render = () => {
       return "todo";
     }
   }

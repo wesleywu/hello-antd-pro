@@ -1,12 +1,5 @@
-import { Class, Visibility, visible } from "./types";
-import {
-  FIELD_CONFIGS,
-  FieldConfig,
-  SEARCH_CONFIGS,
-  SearchConfig,
-  TABLE_CONFIG,
-  TableConfig
-} from "./decorators";
+import { Class, ProtoType, Visibility, visible } from "./types";
+import { FIELD_CONFIGS, FieldConfig, SEARCH_CONFIGS, SearchConfig, TABLE_CONFIG, TableConfig } from "./decorators";
 
 function getTableConfig(table: Class): TableConfig {
   const config = table.prototype[TABLE_CONFIG] as TableConfig;
@@ -71,15 +64,17 @@ export abstract class Metadata {
   // 数据类元数据
   private readonly _tableConfig?: TableConfig;
   // 字段元数据列表
-  private readonly _fieldConfigs?: Map<string, FieldConfig>;
+  private readonly _fieldConfigs: Map<string, FieldConfig>;
   // 仅出现在新增表单里的字段元数据列表
-  private readonly _fieldConfigsForCreate?: Map<string, FieldConfig>;
+  private readonly _fieldConfigsForCreate: Map<string, FieldConfig>;
   // 仅出现在编辑表单里的字段元数据列表
-  private readonly _fieldConfigsForUpdate?: Map<string, FieldConfig>;
+  private readonly _fieldConfigsForUpdate: Map<string, FieldConfig>;
   // 仅出现在详情里的字段元数据列表
-  private readonly _fieldConfigsForDetail?: Map<string, FieldConfig>;
+  private readonly _fieldConfigsForDetail: Map<string, FieldConfig>;
   // 查询配置列表
   private readonly _searchConfigs?: Map<string, SearchConfig>;
+  // ProtoType 为 SimpleArray 的字段名，这些字段需要进行 wrap/unwrap 才能使用 ProFormList 控件渲染
+  private readonly _simpleArrayFields: Set<string>;
 
   constructor(recordClass: any) {
     this._tableConfig = getTableConfig(recordClass);
@@ -112,6 +107,15 @@ export abstract class Metadata {
       });
       return subMap
     })();
+    this._simpleArrayFields = (() => {
+      let fieldNameSet = new Set<string>();
+      this._fieldConfigs?.forEach((value, key) => {
+        if (value.columnType === ProtoType.SimpleArray) {
+          fieldNameSet.add(key);
+        }
+      });
+      return fieldNameSet;
+    })();
     // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
     // console.log("searchConfigs", this.searchConfigs);
@@ -128,6 +132,7 @@ export abstract class Metadata {
   fieldConfigsForUpdate = () => this._fieldConfigsForUpdate;
   fieldConfigsForDetail = () => this._fieldConfigsForDetail;
   searchConfigs = () => this._searchConfigs;
+  simpleArrayFields = () => this._simpleArrayFields;
 }
 
 // 可以用 new 创建实例的 Metadata 类，仅仅是继承了 abstract 的 Metadata

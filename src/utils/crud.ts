@@ -30,7 +30,7 @@ abstract class CrudApi<T extends Record<string, any>> {
   // 字段元数据列表
   private readonly fieldConfigs: Map<string, FieldConfig>;
   // 查询配置列表
-  private readonly searchConfigs: Map<string, SearchConfig>;
+  private readonly searchConfigs?: Map<string, SearchConfig>;
 
   constructor(recordClass: Class<T>) {
     const metadata = MetadataFactory.get(recordClass);
@@ -134,7 +134,7 @@ abstract class CrudApi<T extends Record<string, any>> {
       if (fieldConfig === undefined) {
         continue
       }
-      let searchConfig = this.searchConfigs.get(fieldName);
+      let searchConfig = this.searchConfigs?.get(fieldName);
       if (searchConfig === undefined) {
         searchConfig = newSearchConfig();
       }

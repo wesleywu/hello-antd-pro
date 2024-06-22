@@ -83,6 +83,8 @@ export enum ControlType {
   Select,
   DateRangePicker,
   DateTimeRangePicker,
+  FormSet,
+  FormList,
 }
 
 export type Visibility = number;

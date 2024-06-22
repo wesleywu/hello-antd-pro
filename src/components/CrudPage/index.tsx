@@ -10,7 +10,7 @@ import {
 import { Button, Drawer, message, Popconfirm, Space } from "antd";
 import { CrudApiFactory } from "@/utils/crud";
 import { useRequest } from "@@/exports";
-import { getDetailColumns, getTableColumns } from "@/utils/columns";
+import { getDetailColumns, getTableColumns, wrapFieldsValue } from "@/utils/columns";
 import { CreateForm } from "@/components/CreateForm";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { UpdateForm } from "@/components/UpdateForm";
@@ -40,10 +40,17 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
   const [selectedRows, setSelectedRows] = useState<T[]>([]);
   // Toast 消息显示
   const [messageApi, contextHolder] = message.useMessage();
+  // 所有元数据
+  const metadata = MetadataFactory.get(recordClass);
   // 数据类元数据
-  const tableConfig = MetadataFactory.get(recordClass).tableConfig();
+  const tableConfig = metadata.tableConfig();
   // crud api
   const api = CrudApiFactory.get(recordClass);
+  // 需要在渲染前转换内容的字段列表
+  const fieldsNeedWrapping = metadata.simpleArrayFields();
+  // 当前行的包赚，将 SimpleArray 类型字段的元素包装成一个 [{value: "xxx"}...] 的 Object，以便 ProFormList 能够正确渲染
+  const currentRowWrapped = (row: T | undefined ) => row ? wrapFieldsValue(row, fieldsNeedWrapping): undefined;
+
   // 删除单一记录的请求
   const { run: deleteSingleRow } = useRequest(api.delete, {
     manual: true,
@@ -170,8 +177,8 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
         onCancel={() => {
           setShowUpdateForm(false);
         }}
-        idValue={currentRow?.id || ''}
-        getValues={() => currentRow || {} }
+        idValue={ currentRow?.id || '' }
+        fieldsValue={ currentRowWrapped(currentRow) as Partial<any> }
       />,
       <Drawer
         width={600}

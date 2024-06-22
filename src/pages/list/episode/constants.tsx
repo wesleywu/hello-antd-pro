@@ -123,7 +123,7 @@ export class Episode implements Record<string, any> {
   @field({
     description: "关键词",
     columnType: ProtoType.SimpleArray,
-    visibility: visible.detail,
+    visibility: visible.detail | visible.create | visible.update,
   })
   keywords: string[];
 

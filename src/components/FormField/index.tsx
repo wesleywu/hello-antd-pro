@@ -2,13 +2,13 @@ import { FC } from "react";
 import { ProFormFieldItemProps, ProFormFieldRemoteProps } from "@ant-design/pro-form/es/typing";
 import {
   ProFormDateRangePicker,
+  ProFormDateTimeRangePicker,
   ProFormDigit,
   ProFormSelect,
   ProFormText,
   ProFormTextArea
 } from "@ant-design/pro-form";
 import { ControlType } from "@/utils/types";
-import { ProFormDateTimeRangePicker } from "@ant-design/pro-form";
 import { FieldConfigOptional } from "@/utils/decorators";
 import { getControlType } from "@/utils/controltype";
 
@@ -57,5 +57,7 @@ export const FormField: FC<FieldItemProps> = (props: FieldItemProps) => {
     case ControlType.DateTimeRangePicker:
       return (<ProFormDateTimeRangePicker {...newProps}
       />);
+    default:
+      return (<span>不支持的控件类型: {controlType}</span>);
   }
 };

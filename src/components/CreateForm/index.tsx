@@ -1,15 +1,16 @@
 import { FC, useRef } from "react";
 import { DrawerFormProps } from "@ant-design/pro-form/es/layouts/DrawerForm";
-import { DrawerForm, ProFormInstance } from "@ant-design/pro-components";
+import { DrawerForm, ProFormInstance, ProFormList, ProFormText } from "@ant-design/pro-components";
 import { Button, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRequest } from "@@/exports";
 
-import { Class } from "@/utils/types";
+import { Class, ControlType } from "@/utils/types";
 import { FormField } from "@/components/FormField";
 import { CrudApiFactory } from "@/utils/crud";
 import { MetadataFactory } from "@/utils/metadata";
 import { getControlType } from "@/utils/controltype";
+import { unwrapFieldsValue } from "@/utils/columns";
 
 interface CreateFormProps<T> {
   recordClass: Class<T>,
@@ -31,6 +32,8 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const fieldConfigs = metadata.fieldConfigsForCreate();
   // crud api 实例
   const crudApi = CrudApiFactory.get(recordClass);
+  // 需要在提交前转换内容的字段列表
+  const fieldsNeedUnwrapping = metadata.simpleArrayFields();
   // 执行 api create
   const { run } = useRequest(crudApi.create, {
     manual: true,
@@ -47,16 +50,33 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
   const renderFields = () => {
     const controls: any[] = [];
     fieldConfigs.forEach((fieldConfig, fieldName) => {
-      controls.push(
-        <FormField
-          key={ fieldName }
-          fieldName={ fieldName }
-          columnType={ fieldConfig.columnType }
-          controlTypeInCreateForm={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
-          required={ fieldConfig.required }
-          description={ fieldConfig.description }
-          displayValueMapping={ fieldConfig.displayValueMapping }
-        />);
+      const controlType = getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm);
+      if (controlType === ControlType.FormSet) {
+        controls.push(
+          <ProFormList
+            key={ fieldName }
+            name={ fieldName }
+            label={ fieldConfig.description }
+            creatorButtonProps={{
+              position: 'bottom',
+              creatorButtonText: '增加一项',
+            }}
+          >
+            <ProFormText name="value" width="md" />
+          </ProFormList>
+        );
+      } else {
+        controls.push(
+          <FormField
+            key={ fieldName }
+            fieldName={ fieldName }
+            columnType={ fieldConfig.columnType }
+            controlTypeInCreateForm={ getControlType(fieldConfig.columnType, fieldConfig.controlTypeInCreateForm) }
+            required={ fieldConfig.required }
+            description={ fieldConfig.description }
+            displayValueMapping={ fieldConfig.displayValueMapping }
+          />);
+      }
     });
     return controls;
   };
@@ -73,7 +93,7 @@ export const CreateForm: FC<CreateFormProps<any> & DrawerFormProps> = (props: Cr
         width="500px"
         // modalProps={{ okButtonProps: { loading } }}
         onFinish={ async (value) => {
-          await run(value);
+          await run(unwrapFieldsValue(value, fieldsNeedUnwrapping));
           return true;
         } }
       >
