@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useRef, useState } from "react";
+import { FC, ReactNode, useCallback, useMemo, useRef, useState } from "react";
 import {
   ActionType,
   FooterToolbar,
@@ -96,9 +96,15 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
   // 处理点击删除按钮的逻辑
   const onDeleteClick = useCallback((record: T) => deleteSingleRow({id: record.id}), [deleteSingleRow])
   // 定义表格显示的列
-  const tableColumns = getTableColumns(recordClass, onUpdateClick, onDeleteClick);
+  const tableColumns = useMemo(
+    () => getTableColumns(recordClass, onUpdateClick, onDeleteClick),
+    [recordClass]
+  );
   // 定义详情显示的列
-  const detailColumns = getDetailColumns(recordClass);
+  const detailColumns = useMemo(
+    () => getDetailColumns(recordClass),
+    [recordClass]
+  );
 
   return (
     <PageContainer>
@@ -176,19 +182,17 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
         }}
         closable={true}
       >
-        {currentRow?.name && (
-          <ProDescriptions<T>
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.id,
-            }}
-            columns={detailColumns as ProDescriptionsItemProps<T>[]}
-          />
-        )}
+        <ProDescriptions<T>
+          column={2}
+          title={currentRow?.name}
+          request={async () => ({
+            data: currentRow || {},
+          })}
+          params={{
+            id: currentRow?.id,
+          }}
+          columns={detailColumns as ProDescriptionsItemProps<T>[]}
+        />
       </Drawer>
     </PageContainer>
   );

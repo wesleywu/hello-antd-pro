@@ -10,10 +10,7 @@ import {
 
 function getTableConfig(table: Class): TableConfig {
   const config = table.prototype[TABLE_CONFIG] as TableConfig;
-  if (config === undefined) {
-    throw new Error("必须在持久化对象类(Persistent Object class)上使用 @table 装饰器定义元数据");
-  }
-  if (config.description === undefined) {
+  if (config && config?.description === undefined) {
     config.description = table.name;
   }
   return config;
@@ -72,15 +69,17 @@ export function showInUpdate(visibility?: Visibility): boolean {
 
 export abstract class Metadata {
   // 数据类元数据
-  private readonly _tableConfig: TableConfig;
+  private readonly _tableConfig?: TableConfig;
   // 字段元数据列表
-  private readonly _fieldConfigs: Map<string, FieldConfig>;
+  private readonly _fieldConfigs?: Map<string, FieldConfig>;
   // 仅出现在新增表单里的字段元数据列表
-  private readonly _fieldConfigsForCreate: Map<string, FieldConfig>;
+  private readonly _fieldConfigsForCreate?: Map<string, FieldConfig>;
   // 仅出现在编辑表单里的字段元数据列表
-  private readonly _fieldConfigsForUpdate: Map<string, FieldConfig>;
+  private readonly _fieldConfigsForUpdate?: Map<string, FieldConfig>;
+  // 仅出现在详情里的字段元数据列表
+  private readonly _fieldConfigsForDetail?: Map<string, FieldConfig>;
   // 查询配置列表
-  private readonly _searchConfigs: Map<string, SearchConfig>;
+  private readonly _searchConfigs?: Map<string, SearchConfig>;
 
   constructor(recordClass: any) {
     this._tableConfig = getTableConfig(recordClass);
@@ -88,7 +87,7 @@ export abstract class Metadata {
     this._searchConfigs = getSearchConfigs(recordClass);
     this._fieldConfigsForCreate = (() => {
       let subMap = new Map<string, FieldConfig>;
-      this._fieldConfigs.forEach((value, key) => {
+      this._fieldConfigs?.forEach((value, key) => {
         if (showInCreate(value.visibility)) {
           subMap.set(key, value);
         }
@@ -97,8 +96,17 @@ export abstract class Metadata {
     })();
     this._fieldConfigsForUpdate = (() => {
       let subMap = new Map<string, FieldConfig>;
-      this._fieldConfigs.forEach((value, key) => {
+      this._fieldConfigs?.forEach((value, key) => {
         if (showInUpdate(value.visibility)) {
+          subMap.set(key, value);
+        }
+      });
+      return subMap
+    })();
+    this._fieldConfigsForDetail = (() => {
+      let subMap = new Map<string, FieldConfig>;
+      this._fieldConfigs?.forEach((value, key) => {
+        if (showInDetail(value.visibility)) {
           subMap.set(key, value);
         }
       });
@@ -109,10 +117,16 @@ export abstract class Metadata {
     // console.log("searchConfigs", this.searchConfigs);
   }
 
-  tableConfig = () => this._tableConfig;
+  tableConfig = () => {
+    if (this._tableConfig === undefined) {
+      throw new Error("没有在数据类(Persistent Object class)上使用 @table 装饰器定义元数据");
+    }
+    return this._tableConfig;
+  }
   fieldConfigs = () => this._fieldConfigs;
   fieldConfigsForCreate = () => this._fieldConfigsForCreate;
   fieldConfigsForUpdate = () => this._fieldConfigsForUpdate;
+  fieldConfigsForDetail = () => this._fieldConfigsForDetail;
   searchConfigs = () => this._searchConfigs;
 }
 

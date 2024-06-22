@@ -123,18 +123,22 @@ export class Episode implements Record<string, any> {
   @field({
     description: "关键词",
     columnType: ProtoType.SimpleArray,
+    visibility: visible.detail,
   })
   keywords: string[];
 
   @field({
     description: "提纲",
     columnType: ProtoType.SimpleMap,
+    visibility: visible.detail,
   })
   outlines: Map<string, string>;
 
   @field({
     description: "提问&回答",
     columnType: ProtoType.ObjectArray,
+    subElementClass: QuestionAnswer,
+    visibility: visible.detail,
   })
   qas: string[];
 

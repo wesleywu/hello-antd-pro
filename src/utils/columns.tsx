@@ -1,14 +1,15 @@
-import { ProColumns } from "@ant-design/pro-components";
-import { Collapse, DatePicker, Descriptions, Popconfirm, Space } from "antd";
+import { ProColumns, ProDescriptions, ProDescriptionsItemProps } from "@ant-design/pro-components";
+import { Collapse, DatePicker, Descriptions, Divider, Popconfirm, Space } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { JSX } from "react/jsx-runtime";
 
-import { MetadataFactory, showInDetail, showInList, showInSearch } from "./metadata";
+import { MetadataFactory, showInList, showInSearch } from "./metadata";
 import { Class, ControlType, ProtoType } from "./types";
 import { FieldConfig } from "./decorators";
 import { getControlType, getProFieldValueType } from "./controltype";
 
-const renderSimpleArray = (fieldName: string) => ( _: any, entity: Record<string, any>) => {
+
+const renderSimpleArray = (fieldName: string) => ( entity: Record<string, any>) => {
   const fieldValue = entity[fieldName] as Array<any>;
   if (fieldValue === undefined || fieldValue.length === 0) {
     return "";
@@ -24,7 +25,7 @@ const renderSimpleArray = (fieldName: string) => ( _: any, entity: Record<string
   );
 };
 
-const renderSimpleMap = (fieldName: string) => ( _: any, entity: Record<string, any>) => {
+const renderSimpleMap = (fieldName: string) => (entity: Record<string, any>) => {
   const fieldValue = entity[fieldName] as Map<any, any>;
   if (fieldValue === undefined || Object.keys(fieldValue).length === 0) {
     return "";
@@ -43,28 +44,7 @@ const renderSimpleMap = (fieldName: string) => ( _: any, entity: Record<string, 
   );
 };
 
-const renderObjectArray = (fieldName: string) => ( _: any, entity: Record<string, any>) => {
-  const fieldValue = entity[fieldName] as Array<any>;
-  if (fieldValue === undefined || fieldValue.length === 0) {
-    return "";
-  }
-  const subObjects = [];
-  for (const item of fieldValue) {
-    const subProperties = [];
-    for (const propKey of Object.keys(item)) {
-      const propValue = item[propKey];
-      subProperties.push(<Descriptions.Item label={propKey} key={propKey}>{propValue}</Descriptions.Item>);
-    }
-    subObjects.push(
-      <Descriptions title={""} layout={"horizontal"} column={1} colon={false} size={"small"}>
-        {subProperties}
-      </Descriptions>
-    );
-  }
-  return subObjects;
-};
-
-function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: boolean): ProColumns {
+function getProColumnNoSubElement(fieldName: string, fieldConfig: FieldConfig): ProColumns {
   const searchControlType = getControlType(fieldConfig.columnType, fieldConfig.controlTypeInSearchForm);
   const result: ProColumns = {
     title: fieldConfig.description,
@@ -89,9 +69,6 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
   if (!showInList(fieldConfig.visibility)) {
     result.hideInTable = true;
   }
-  if (!showInDetail(fieldConfig.visibility)) {
-    result.hideInDescriptions = true;
-  }
   if (!showInSearch(fieldConfig.visibility)) {
     result.hideInSearch = true;
   }
@@ -101,9 +78,80 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
   if (fieldConfig.filterable) {
     result.filters = true;
   }
+  return result;
+}
+
+export function getDetailColumnsNoSubElement<T extends Record<string, any>>(recordClass: Class<T>): ProColumns[] {
+  const metadata = MetadataFactory.get(recordClass);
+  const fieldConfigs = metadata.fieldConfigs();
+  const columns: ProColumns[] = [];
+  // 生成字段对应的列
+  fieldConfigs?.forEach((fieldConfig, fieldName) => {
+    columns.push(getProColumnNoSubElement(fieldName, fieldConfig));
+  });
+  return columns;
+}
+
+const renderObjectArray = (fieldName: string, fieldConfig: FieldConfig) => (entity: Record<string, any>) => {
+  // console.log("0_entity", entity);
+  // console.log("1_renderObjectArray", fieldName);
+  const fieldValue = entity[fieldName] as Array<any>;
+  // console.log("2_fieldValue", fieldValue);
+  if (fieldValue === undefined || fieldValue.length === 0) {
+    return "";
+  }
+  const subObjects = [];
+  if (fieldConfig.subElementClass) { // 如果当前列定义了子元素的 class，那么直接通过子元素的 class 元数据来渲染
+    const subElementColumns = getDetailColumnsNoSubElement(fieldConfig.subElementClass) as ProDescriptionsItemProps[];
+    // console.log("subElementColumns", subElementColumns);
+    for (let i = 0; i < fieldValue.length; i++) {
+      const item = fieldValue[i];
+      subObjects.push(
+        <ProDescriptions
+          key={i}
+          params={item}
+          column={ 1 }
+          columns={ subElementColumns }
+          title={ '' }
+          request={ async () => ({
+            data: item || {},
+          }) }
+        />
+      )
+    }
+    return (
+      <Space direction="vertical" size={"small"} split={<Divider type="horizontal" style={{ margin: '0px 0'}} />}>
+        {subObjects}
+      </Space>
+    );
+  }
+  for (const item of fieldValue) {
+    const subProperties = [];
+    for (const propKey of Object.keys(item)) {
+      const propValue = item[propKey];
+      subProperties.push(<Descriptions.Item label={propKey} key={propKey}>{propValue}</Descriptions.Item>);
+    }
+    subObjects.push(
+      <Descriptions title={""} layout={"horizontal"} column={1} colon={false} size={"small"}>
+        {subProperties}
+      </Descriptions>
+    );
+  }
+  return (
+    <Space direction="vertical" size={"small"} split={<Divider type="horizontal" style={{ margin: '0px 0'}} />}>
+      {subObjects}
+    </Space>
+  );
+};
+
+function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: boolean): ProColumns {
+  // console.log('getProColumn', fieldName);
+  const result: ProColumns = getProColumnNoSubElement(fieldName, fieldConfig);
   if (fieldConfig.columnType === ProtoType.SimpleArray) {
     if (forDetail) {
-      result.render = renderSimpleArray(fieldName);
+      result.render = ( _: any, entity: Record<string, any>) => {
+        return renderSimpleArray(fieldName)(entity);
+      }
     } else {
       result.width = 200;
       result.render = ( _: any, entity: Record<string, any>) => {
@@ -117,13 +165,15 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
                             key: '缺省不展开',
                             label: `查看 ${size} 条内容`,
                             onClick: (e: any) => {e.stopPropagation();},
-                            children: renderSimpleArray(fieldName)(null, entity)
+                            children: renderSimpleArray(fieldName)(entity)
                           }]}>
         </Collapse>)
       }}
   } else if (fieldConfig.columnType === ProtoType.SimpleMap) {
     if (forDetail) {
-      result.render = renderSimpleMap(fieldName);
+      result.render = ( _: any, entity: Record<string, any>) => {
+        return renderSimpleMap(fieldName)(entity);
+      }
     } else {
       result.width = 200;
       result.render = ( _: any, entity: Record<string, any>) => {
@@ -137,16 +187,19 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
                        key: '缺省不展开',
                        label: `查看 ${size} 条内容`,
                        onClick: (e: any) => {e.stopPropagation();},
-                       children: renderSimpleMap(fieldName)(null, entity)
+                       children: renderSimpleMap(fieldName)(entity)
                    }]}>
         </Collapse>)
       }}
   } else if (fieldConfig.columnType === ProtoType.ObjectArray) {
     if (forDetail) {
-      result.render = renderObjectArray(fieldName);
+      // console.log("0_ObjectArray", fieldConfig);
+      result.render = ( _: any, entity: Record<string, any>) => {
+        return renderObjectArray(fieldName, fieldConfig)(entity);
+      };
     } else {
       result.width = 200;
-      result.render = ( _: any, entity: Record<string, any>) => {
+      result.render = ( node: any, entity: Record<string, any>) => {
         const fieldValue = entity[fieldName] as Map<any, any>;
         if (fieldValue === undefined || Object.keys(fieldValue).length === 0) {
           return "";
@@ -157,7 +210,7 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
                             key: '缺省不展开',
                             label: `查看 ${size} 条内容`,
                             onClick: (e: any) => {e.stopPropagation();},
-                            children: renderObjectArray(fieldName)(null, entity)
+                            children: renderObjectArray(fieldName, fieldConfig)(entity)
                           }]}>
         </Collapse>)
       }}
@@ -170,12 +223,13 @@ function getProColumn(fieldName: string, fieldConfig: FieldConfig, forDetail?: b
 }
 
 export function getTableColumns<T extends Record<string, any>>(recordClass: Class<T>, onUpdateClick: (record: T) => void, onDeleteClick: (record: T) => void): ProColumns[] {
+  // console.log('getTableColumns', recordClass);
   const metadata = MetadataFactory.get(recordClass);
   const tableConfig = metadata.tableConfig();
   const fieldConfigs = metadata.fieldConfigs();
   const columns: ProColumns[] = [];
   // 生成字段对应的列
-  fieldConfigs.forEach((fieldConfig, fieldName) => {
+  fieldConfigs?.forEach((fieldConfig, fieldName) => {
     columns.push(getProColumn(fieldName, fieldConfig));
   });
   // 生成操作列
@@ -230,12 +284,14 @@ export function getTableColumns<T extends Record<string, any>>(recordClass: Clas
 }
 
 export function getDetailColumns<T extends Record<string, any>>(recordClass: Class<T>): ProColumns[] {
+  // console.log('getDetailColumns', recordClass);
   const metadata = MetadataFactory.get(recordClass);
-  const fieldConfigs = metadata.fieldConfigs();
+  const fieldConfigs = metadata.fieldConfigsForDetail();
   const columns: ProColumns[] = [];
   // 生成字段对应的列
-  fieldConfigs.forEach((fieldConfig, fieldName) => {
+  fieldConfigs?.forEach((fieldConfig, fieldName) => {
     columns.push(getProColumn(fieldName, fieldConfig, true));
   });
+  // console.log("detail columns:", columns);
   return columns;
 }

@@ -1,4 +1,4 @@
-import { ControlType, MultiType, OperatorType, Optional, ProtoType, Visibility, WildcardType } from "./types";
+import { Class, ControlType, MultiType, OperatorType, Optional, ProtoType, Visibility, WildcardType } from "./types";
 import { camelToSnakeCase } from "./strings";
 
 // 用于存储 数据类元数据的 Symbol
@@ -19,6 +19,7 @@ export type TableConfig = {
 // 定义数据类字段配置元数据的结构
 export type FieldConfig = {
   columnType: ProtoType;
+  subElementClass?: Class<any>;
   dbColumnName: string;
   description: string;
   required?: boolean;
