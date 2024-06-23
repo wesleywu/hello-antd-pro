@@ -8,16 +8,33 @@ import { Class, ControlType, ProtoType } from "./types";
 import { FieldConfig } from "./decorators";
 import { getControlType, getProFieldValueType } from "./controltype";
 
-export type ValueWrapper<T> = {
+export type SimpleArrayValueWrapper<T> = {
+  value: T;
+}
+
+export type SimpleMapValueWrapper<T> = {
+  key: string;
   value: T;
 }
 
 /**
- * transformObjectArrayToPlainArray 将 [{value: "1"}, {value: "2"}] 转换为 ["1", "2"]
+ * unwrapSimpleArray 将 [{value: "1"}, {value: "2"}] 转换为 ["1", "2"]
  * @param value
  */
-function unwrapArray(value: ValueWrapper<any>[]): Record<string, any>[] {
+function unwrapSimpleArray(value: SimpleArrayValueWrapper<any>[]): any[] {
   return value.map((item) => item.value);
+}
+
+/**
+ * unwrapSimpleMap 将 [{"key": "key1", "value": "value1"}, {"key": "key2", "value": "value2"}] 转换为 [{key1: "value1"}, {key2: "value2"}]
+ * @param fieldValue
+ */
+function unwrapSimpleMap(fieldValue: SimpleMapValueWrapper<any>[]): any {
+  const result = {};
+  for (const item of fieldValue) {
+    result[item.key] = item.value;
+  }
+  return result;
 }
 
 /**
@@ -25,34 +42,93 @@ function unwrapArray(value: ValueWrapper<any>[]): Record<string, any>[] {
  * @param value
  * @param fieldsNeedUnwrapping
  */
-export function unwrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedUnwrapping: Set<string>): T {
+export function unwrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedUnwrapping: Map<string, FieldConfig>): T {
   console.log("value before unwrapping", value);
   const unwrappedValue: Record<string, any> = Object.assign({}, value);
   for (const fieldName of Object.keys(value)) {
     if (fieldsNeedUnwrapping.has(fieldName)) {
-      unwrappedValue[fieldName] = unwrapArray(value[fieldName])
+      switch (fieldsNeedUnwrapping.get(fieldName)?.columnType) {
+        case ProtoType.SimpleArray:
+          unwrappedValue[fieldName] = unwrapSimpleArray(value[fieldName]);
+          break;
+        case ProtoType.SimpleMap:
+          unwrappedValue[fieldName] = unwrapSimpleMap(value[fieldName]);
+          break;
+        case ProtoType.ObjectArray:
+          unwrappedValue[fieldName] = value[fieldName];
+          break;
+        // case ProtoType.ObjectMap:
+        //   unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
+        //   break;
+        default:
+          unwrappedValue[fieldName] = unwrapSimpleArray(value[fieldName])
+          break;
+      }
     }
   }
   console.log("value after unwrapping", unwrappedValue);
   return unwrappedValue as T;
 }
 
-function wrapArray(value: any): ValueWrapper<any>[] {
+function wrapSimpleArray(value: any): SimpleArrayValueWrapper<any>[] {
   if (Array.isArray(value)) {
-    return value.map((item) => ({ value: item }));
+    const result = value.map((item) => ({ value: item }));
+    console.log("wrapSimpleArray: value after wrapping", result);
+    return result;
   } else {
     return [{ value }];
   }
 }
 
-export function wrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedWrapping: Set<string>): Partial<T>  {
+function wrapSimpleMap(value: any): SimpleMapValueWrapper<any>[] {
+  if (value instanceof Map) {
+    const entries = Array.from(value.entries());
+    const result = entries.map(([key, value]) => ({ key, value }));
+    console.log("wrapSimpleMap: value after wrapping", result);
+    return result;
+  } else {
+    console.log("wrapSimpleMap: value before wrapping", value);
+    const result: SimpleMapValueWrapper<any>[] = [];
+    for (const fieldName of Object.keys(value)) {
+      result.push({
+        key: fieldName,
+        value: value[fieldName]
+      })
+    }
+    console.log("wrapSimpleMap: value after wrapping", result);
+    return result;
+  }
+}
+
+export function wrapFieldsValue<T extends Record<string, any>>(value: T, fieldsNeedUnwrapping: Map<string, FieldConfig>): Partial<T>  {
   if (!value) {
     return value;
   }
+  console.log("fieldsNeedUnwrapping", fieldsNeedUnwrapping);
   const wrappedValue: Record<string, any> = Object.assign({}, value);
   for (const fieldName of Object.keys(value)) {
-    if (fieldsNeedWrapping.has(fieldName)) {
-      wrappedValue[fieldName] = wrapArray(value[fieldName])
+    if (fieldsNeedUnwrapping.has(fieldName)) {
+      switch (fieldsNeedUnwrapping.get(fieldName)?.columnType) {
+        case ProtoType.SimpleArray:
+          wrappedValue[fieldName] = wrapSimpleArray(value[fieldName]);
+          break;
+        case ProtoType.SimpleMap:
+          console.log("wrapping field", fieldName, value[fieldName])
+          wrappedValue[fieldName] = wrapSimpleMap(value[fieldName]);
+          console.log("wrapping field result", fieldName, wrappedValue[fieldName])
+          break;
+        case ProtoType.ObjectArray:
+          console.log("wrapping field", fieldName, value[fieldName])
+          wrappedValue[fieldName] = value[fieldName];
+          // unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
+          break;
+        // case ProtoType.ObjectMap:
+        //   unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
+        //   break;
+        default:
+          wrappedValue[fieldName] = wrapSimpleArray(value[fieldName])
+          break;
+      }
     }
   }
   return wrappedValue as T;
@@ -94,7 +170,7 @@ const renderSimpleMap = (fieldName: string) => (entity: Record<string, any>) => 
 };
 
 function getProColumnNoSubElement(fieldName: string, fieldConfig: FieldConfig): ProColumns {
-  const searchControlType = getControlType(fieldConfig.columnType, fieldConfig.controlTypeInSearchForm);
+  const searchControlType = getControlType(fieldConfig.columnType, fieldConfig.searchControlType);
   const result: ProColumns = {
     title: fieldConfig.description,
     dataIndex: fieldName,

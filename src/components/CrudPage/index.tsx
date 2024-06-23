@@ -47,7 +47,7 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
   // crud api
   const api = CrudApiFactory.get(recordClass);
   // 需要在渲染前转换内容的字段列表
-  const fieldsNeedWrapping = metadata.simpleArrayFields();
+  const fieldsNeedWrapping = metadata.fieldConfigsNeedWrapping();
   // 当前行的包赚，将 SimpleArray 类型字段的元素包装成一个 [{value: "xxx"}...] 的 Object，以便 ProFormList 能够正确渲染
   const currentRowWrapped = (row: T | undefined ) => row ? wrapFieldsValue(row, fieldsNeedWrapping): undefined;
 
@@ -98,6 +98,7 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
     if (showDetail) {
       setShowDetail(false);
     }
+    console.log('current row: ', record);
     setShowUpdateForm(true);
   }, [showDetail]);
   // 处理点击删除按钮的逻辑
@@ -181,7 +182,7 @@ export const CrudPage : FC<CrudPageProps<any>> = <T extends Record<string, any>,
         fieldsValue={ currentRowWrapped(currentRow) as Partial<any> }
       />,
       <Drawer
-        width={600}
+        width={800}
         open={showDetail}
         onClose={() => {
           setCurrentRow(undefined);

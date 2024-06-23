@@ -123,14 +123,14 @@ export class Episode implements Record<string, any> {
   @field({
     description: "关键词",
     columnType: ProtoType.SimpleArray,
-    visibility: visible.detail | visible.create | visible.update,
+    visibility: visible.list | visible.detail | visible.create | visible.update,
   })
   keywords: string[];
 
   @field({
     description: "提纲",
     columnType: ProtoType.SimpleMap,
-    visibility: visible.detail,
+    visibility: visible.list | visible.detail | visible.create | visible.update,
   })
   outlines: Map<string, string>;
 
@@ -138,7 +138,7 @@ export class Episode implements Record<string, any> {
     description: "提问&回答",
     columnType: ProtoType.ObjectArray,
     subElementClass: QuestionAnswer,
-    visibility: visible.detail,
+    visibility: visible.list | visible.detail | visible.create | visible.update,
   })
   qas: string[];
 

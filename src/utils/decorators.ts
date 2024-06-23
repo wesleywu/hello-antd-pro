@@ -26,9 +26,8 @@ export type FieldConfig = {
   visibility?: Visibility;
   sortable? : boolean;
   filterable? : boolean;
-  controlTypeInCreateForm?: ControlType;
-  controlTypeInUpdateForm?: ControlType;
-  controlTypeInSearchForm?: ControlType;
+  editControlType?: ControlType;
+  searchControlType?: ControlType;
   displayValueMapping?: Map<any, any>;
 }
 

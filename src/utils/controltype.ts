@@ -22,13 +22,13 @@ export function getControlType(protoType: ProtoType, controlType?: ControlType):
     case ProtoType.DateTime:
       return ControlType.DateTimeRangePicker;
     case ProtoType.SimpleArray:
-      return ControlType.FormSet;
+      return ControlType.SimpleArray;
     case ProtoType.SimpleMap:
-      return ControlType.FormList;
+      return ControlType.SimpleMap;
     case ProtoType.ObjectArray:
-      return ControlType.FormList;
+      return ControlType.ObjectArray;
     case ProtoType.ObjectMap:
-      return ControlType.FormList;
+      return ControlType.ObjectMap;
   }
 }
 
@@ -48,9 +48,13 @@ export function getProFieldValueType(controlType: ControlType): ProFieldValueTyp
       return "dateTime";
     case ControlType.DateTimeRangePicker:
       return "dateTime";
-    case ControlType.FormSet:
-      return "formSet";
-    case ControlType.FormList:
+    case ControlType.SimpleArray:
+      return "formList";
+    case ControlType.SimpleMap:
+      return "formList";
+    case ControlType.ObjectArray:
+      return "formList";
+    case ControlType.ObjectMap:
       return "formList";
   }
 }

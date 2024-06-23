@@ -34,7 +34,7 @@ export const FormField: FC<FieldItemProps> = (props: FieldItemProps) => {
   if (newProps.displayValueMapping) {
     newProps.valueEnum = newProps.displayValueMapping;
   }
-  const controlType: ControlType = getControlType(newProps.columnType,  newProps.controlTypeInCreateForm);
+  const controlType: ControlType = getControlType(newProps.columnType,  newProps.editControlType);
   switch (controlType) {
     case ControlType.Text:
       return (<ProFormText {...newProps}

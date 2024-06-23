@@ -71,10 +71,10 @@ export abstract class Metadata {
   private readonly _fieldConfigsForUpdate: Map<string, FieldConfig>;
   // 仅出现在详情里的字段元数据列表
   private readonly _fieldConfigsForDetail: Map<string, FieldConfig>;
+  // ProtoType 为 SimpleArray 的字段名，这些字段需要进行 wrap/unwrap 才能使用 ProFormList 控件渲染
+  private readonly _fieldConfigsNeedWrapping: Map<string, FieldConfig>;
   // 查询配置列表
   private readonly _searchConfigs?: Map<string, SearchConfig>;
-  // ProtoType 为 SimpleArray 的字段名，这些字段需要进行 wrap/unwrap 才能使用 ProFormList 控件渲染
-  private readonly _simpleArrayFields: Set<string>;
 
   constructor(recordClass: any) {
     this._tableConfig = getTableConfig(recordClass);
@@ -107,14 +107,14 @@ export abstract class Metadata {
       });
       return subMap
     })();
-    this._simpleArrayFields = (() => {
-      let fieldNameSet = new Set<string>();
+    this._fieldConfigsNeedWrapping = (() => {
+      let subMap = new Map<string, FieldConfig>;
       this._fieldConfigs?.forEach((value, key) => {
-        if (value.columnType === ProtoType.SimpleArray) {
-          fieldNameSet.add(key);
+        if (value.columnType === ProtoType.SimpleArray || value.columnType === ProtoType.SimpleMap || value.columnType === ProtoType.ObjectArray || value.columnType === ProtoType.ObjectMap) {
+          subMap.set(key, value);
         }
       });
-      return fieldNameSet;
+      return subMap;
     })();
     // console.log("tableConfig", this.tableConfig);
     // console.log("fieldConfigs", this.fieldConfigs);
@@ -132,7 +132,7 @@ export abstract class Metadata {
   fieldConfigsForUpdate = () => this._fieldConfigsForUpdate;
   fieldConfigsForDetail = () => this._fieldConfigsForDetail;
   searchConfigs = () => this._searchConfigs;
-  simpleArrayFields = () => this._simpleArrayFields;
+  fieldConfigsNeedWrapping = () => this._fieldConfigsNeedWrapping;
 }
 
 // 可以用 new 创建实例的 Metadata 类，仅仅是继承了 abstract 的 Metadata
