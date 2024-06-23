@@ -110,7 +110,7 @@ export abstract class Metadata {
     this._fieldConfigsNeedWrapping = (() => {
       let subMap = new Map<string, FieldConfig>;
       this._fieldConfigs?.forEach((value, key) => {
-        if (value.columnType === ProtoType.SimpleArray || value.columnType === ProtoType.SimpleMap || value.columnType === ProtoType.ObjectArray || value.columnType === ProtoType.ObjectMap) {
+        if (value.columnType === ProtoType.SimpleArray || value.columnType === ProtoType.SimpleMap || value.columnType === ProtoType.ObjectMap) {
           subMap.set(key, value);
         }
       });

@@ -54,9 +54,6 @@ export function unwrapFieldsValue<T extends Record<string, any>>(value: T, field
         case ProtoType.SimpleMap:
           unwrappedValue[fieldName] = unwrapSimpleMap(value[fieldName]);
           break;
-        case ProtoType.ObjectArray:
-          unwrappedValue[fieldName] = value[fieldName];
-          break;
         // case ProtoType.ObjectMap:
         //   unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
         //   break;
@@ -116,11 +113,6 @@ export function wrapFieldsValue<T extends Record<string, any>>(value: T, fieldsN
           console.log("wrapping field", fieldName, value[fieldName])
           wrappedValue[fieldName] = wrapSimpleMap(value[fieldName]);
           console.log("wrapping field result", fieldName, wrappedValue[fieldName])
-          break;
-        case ProtoType.ObjectArray:
-          console.log("wrapping field", fieldName, value[fieldName])
-          wrappedValue[fieldName] = value[fieldName];
-          // unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
           break;
         // case ProtoType.ObjectMap:
         //   unwrappedValue[fieldName] = unwrapObjectArray(value[fieldName]);
